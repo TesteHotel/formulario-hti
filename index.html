@@ -420,9 +420,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// CONFIGURAÇÃO DO SUPABASE - VARIÁVEL CORRIGIDA PARA EVITAR CONFLITOS
-const SUPABASE_URL = 'https://tyubyspelmqhgahsdwfr.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5dWJ5c3BlbG1xaGdhaHNkd2ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMTcwMTIsImV4cCI6MjA5NjU5MzAxMn0.xZKWcq_w3FgHNRtvezXZhY8xbBWYxTjBMLWCUQ9N-bQ';
+// CONFIGURAÇÃO DO SUPABASE (Insira suas chaves limpas abaixo, sem barras "/" no final da URL)
+const SUPABASE_URL = 'https://tyubyspelmqgahsdwfr.supabase.co';
+const SUPABASE_ANON_KEY = 'SUA_CHAVE_ANON_AQUI';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const tipoPessoa = document.getElementById("tipoPessoa");
@@ -513,6 +513,7 @@ campoCPFPublico.addEventListener("blur", async function() {
     atualizarTipoPessoa();
 });
 
+// EVENTO DE SUBMIT ATUALIZADO: MÉTODO SEGURO SEM EXIGIR CONSTRAINTS DE UNICIDADE NO BANCO
 document.getElementById("formReservaPublica").addEventListener("submit", async function(e) {
     e.preventDefault();
 
@@ -524,6 +525,55 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
     const hospedagemPetSelecionado = document.querySelector('input[name="hospedagem_pet"]:checked')?.value || "Não";
     const leuNgaSelecionado = document.querySelector('input[name="leu_nga"]:checked')?.value || "Não";
 
+    const dadosHospede = {
+        cpf: document.getElementById("cpf_publico").value,
+        nome_completo: document.getElementById("nome_completo").value,
+        tipo_pessoa: document.getElementById("tipoPessoa").value,
+        cidade_origem: document.getElementById("cidade_origem").value,
+        uf: document.getElementById("uf").value,
+        email: document.getElementById("email").value,
+        telefone: document.getElementById("telefone_publico").value,
+        posto_graduacao: document.getElementById("posto_graduacao").value,
+        situacao_militar: document.getElementById("situacao_militar").value,
+        forca_militar: document.getElementById("forca_militar").value,
+        om_vinculacao: document.getElementById("om_vinculacao").value,
+        cargo_funcao: document.getElementById("cargo_funcao").value,
+        lotacao_orgao: document.getElementById("lotacao_orgao").value
+    };
+
+    // 1. CONSULTA SE O REGISTRO DO HÓSPEDE EXISTE ANTES DE DEFINIR A OPERAÇÃO
+    const { data: hospedeExistente, error: erroBusca } = await supabaseClient
+        .from('hospedes')
+        .select('id')
+        .eq('cpf', dadosHospede.cpf)
+        .maybeSingle();
+
+    let erroHospede = null;
+
+    if (hospedeExistente) {
+        // Se o CPF já existe na base, fazemos um update corretivo
+        const { error: errUp } = await supabaseClient
+            .from('hospedes')
+            .update(dadosHospede)
+            .eq('cpf', dadosHospede.cpf);
+        erroHospede = errUp;
+    } else {
+        // Se for um CPF inédito, fazemos um insert limpo
+        const { error: errIn } = await supabaseClient
+            .from('hospedes')
+            .insert([dadosHospede]);
+        erroHospede = errIn;
+    }
+
+    // Se houver uma trava de RLS (segurança) no Supabase bloqueando a inserção, ele vai capturar o erro aqui
+    if (erroHospede) {
+        alert("Erro no cadastro de Hóspedes (Verifique se o RLS está desativado ou liberado para inserções anônimas na tabela hospedes): " + erroHospede.message);
+        btn.disabled = false;
+        btn.innerText = "Submeter Intenção de Reserva";
+        return;
+    }
+
+    // 2. CADASTRO DE RESERVAS
     const dadosReserva = {
         cpf: document.getElementById("cpf_publico").value,
         nome_completo: document.getElementById("nome_completo").value,
@@ -554,7 +604,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         .select();
 
     if (erroReserva) {
-        alert("Erro ao submeter reserva: " + erroReserva.message);
+        alert("Erro ao submeter intenção de reserva: " + erroReserva.message);
         btn.disabled = false;
         btn.innerText = "Submeter Intenção de Reserva";
         return;
@@ -562,6 +612,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
 
     const idNovaReserva = reservaCriada[0].id;
 
+    // 3. DEPENDENTES E ACOMPANHANTES
     const caixasDependentes = document.querySelectorAll(".dependente-box");
     if (caixasDependentes.length > 0) {
         const listaParaInserir = [];
