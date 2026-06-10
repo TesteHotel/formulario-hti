@@ -420,7 +420,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// URL corrigida sem a letra 'h' fantasma na rota
+// URL corrigida de vez: tyubyspelmqgahsdwfr (Sem a letra 'h' fantasma)
 const SUPABASE_URL = 'https://tyubyspelmqgahsdwfr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5dWJ5c3BlbG1xaGdhaHNkd2ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMTcwMTIsImV4cCI6MjA5NjU5MzAxMn0.xZKWcq_w3FgHNRtvezXZhY8xbBWYxTjBMLWCUQ9N-bQ';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -539,7 +539,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         lotacao_orgao: document.getElementById("lotacao_orgao").value
     };
 
-    // 1. CONSULTA SE O REGISTRO DO HÓSPEDE EXISTE ANTES DE DEFINIR A OPERAÇÃO
+    // 1. SALVAMENTO NA TABELA DE HÓSPEDES (ATUALIZA OU CRIA)
     const { data: hospedeExistente, error: erroBusca } = await supabaseClient
         .from('hospedes')
         .select('id')
