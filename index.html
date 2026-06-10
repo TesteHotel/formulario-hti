@@ -224,7 +224,7 @@
 
         /* --- ESTILOS DO CARD DE SUCESSO COPIADOS DO SISTEMA HTI --- */
         .container-sucesso {
-            display: none; /* Inicia oculto e ativa via JavaScript */
+            display: none; 
             align-items: center;
             justify-content: center;
             min-height: 60vh;
@@ -276,30 +276,42 @@
 
         .grupo-botoes {
             display: flex;
+            flex-direction: column;
             gap: 12px;
             width: 100%;
             margin-top: 8px;
         }
 
         .btn-sucesso {
-            flex: 1;
-            padding: 12px 16px;
+            padding: 14px 16px;
             border-radius: var(--radius-sm);
             font-size: 14px;
             font-weight: 600;
             text-decoration: none;
             text-align: center;
             transition: all 0.2s ease;
+            box-sizing: border-box;
+            width: 100%;
         }
 
         .btn-sucesso-primary {
-            background-color: var(--primary);
+            background-color: #25d366; /* Cor oficial do WhatsApp */
             color: white;
             border: none;
         }
 
         .btn-sucesso-primary:hover {
-            background-color: #14281c;
+            background-color: #128c7e;
+        }
+
+        .btn-sucesso-secondary {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-sucesso-secondary:hover {
+            background-color: #e2e8f0;
         }
     </style>
 </head>
@@ -315,7 +327,7 @@
 
     <div class="alerta-solicitacao">
         <strong>⚠️ Nota Operacional Importante:</strong><br>
-        O preenchimento deste formulário digital manifesta uma <strong>intenção de reserva</strong>. A alocação e confirmação final da UH (quarto) dependem estritamente do plano de disponibilidade e da prioridade regulamentar interna do hotel.
+        O preenchimento deste formulário digital manifesta uma <strong>intenção de reserva</strong>. A alocação e confirmation final da UH (quarto) dependem estritamente do plano de disponibilidade e da prioridade regulamentar interna do hotel.
     </div>
 
     <form id="formReservaPublica">
@@ -495,11 +507,12 @@
         
         <div class="texto-sucesso">
             <h1 class="titulo-sucesso">Operação Concluída!</h1>
-            <p class="subtitulo-sucesso">Sua intenção de reserva e documentações foram processadas com sucesso e as informações já estão ativas no banco de dados do sistema.</p>
+            <p class="subtitulo-sucesso" style="margin-top: 10px;">Sua solicitação e anexos foram salvos na nuvem. Clique no botão abaixo para **enviar o comprovante via WhatsApp** para o setor de reservas do hotel.</p>
         </div>
 
         <div class="grupo-botoes">
-            <button onclick="window.location.reload()" class="btn-sucesso btn-sucesso-primary">Nova Solicitação</button>
+            <a id="btnWhatsApp" target="_blank" class="btn-sucesso btn-sucesso-primary">💬 Enviar via WhatsApp</a>
+            <button onclick="window.location.reload()" class="btn-sucesso btn-sucesso-secondary">Fazer Nova Solicitação</button>
         </div>
     </div>
 </main>
@@ -606,13 +619,19 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
     btn.disabled = true;
     btn.innerText = "Enviando Solicitação...";
 
+    // Coleta das variáveis textuais para a montagem do WhatsApp posterior
+    const inputNome = document.getElementById("nome_completo").value;
+    const inputCPF = document.getElementById("cpf_publico").value;
+    const inputEntradaData = document.getElementById("data_entrada").value;
+    const inputSaidaData = document.getElementById("data_saida").value;
+
     const servicoQuartoSelecionado = document.querySelector('input[name="servico_quarto"]:checked')?.value || "Pela manhã";
     const hospedagemPetSelecionado = document.querySelector('input[name="hospedagem_pet"]:checked')?.value || "Não";
     const leuNgaSelecionado = document.querySelector('input[name="leu_nga"]:checked')?.value || "Não";
 
     const dadosHospede = {
-        cpf: document.getElementById("cpf_publico").value,
-        nome_completo: document.getElementById("nome_completo").value,
+        cpf: inputCPF,
+        nome_completo: inputNome,
         tipo_pessoa: document.getElementById("tipoPessoa").value,
         cidade_origem: document.getElementById("cidade_origem").value,
         uf: document.getElementById("uf").value,
@@ -677,8 +696,8 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
 
     // 2. CADASTRO DE RESERVAS (AGORA COM OS ARQUIVOS INTEGRADOS)
     const dadosReserva = {
-        cpf: document.getElementById("cpf_publico").value,
-        nome_completo: document.getElementById("nome_completo").value,
+        cpf: inputCPF,
+        nome_completo: inputNome,
         tipo_pessoa: document.getElementById("tipoPessoa").value,
         cidade_origem: document.getElementById("cidade_origem").value,
         uf: document.getElementById("uf").value,
@@ -690,8 +709,8 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         om_vinculacao: document.getElementById("om_vinculacao").value,
         cargo_funcao: document.getElementById("cargo_funcao").value,
         lotacao_orgao: document.getElementById("lotacao_orgao").value,
-        data_entrada: document.getElementById("data_entrada").value,
-        data_saida: document.getElementById("data_saida").value,
+        data_entrada: inputEntradaData,
+        data_saida: inputSaidaData,
         servico_quarto: servicoQuartoSelecionado,
         alergia_cafe: document.getElementById("alergia_cafe").value,
         hospedagem_pet: hospedagemPetSelecionado,
@@ -717,6 +736,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
 
     // 3. DEPENDENTES E ACOMPANHANTES
     const caixasDependentes = document.querySelectorAll(".dependente-box");
+    let contagemAcompanhantes = 0;
     if (caixasDependentes.length > 0) {
         const listaParaInserir = [];
         
@@ -726,6 +746,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
             const idade = box.querySelector(".dep-idade").value;
 
             if (nome.trim() !== "") {
+                contagemAcompanhantes++;
                 listaParaInserir.push({
                     id_reserva: idNovaReserva,
                     name: nome,
@@ -747,7 +768,29 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         }
     }
 
-    // ALTERAÇÃO OPERACIONAL DO DISPARO DE TELA: Oculta o formulário e ativa o Card de Sucesso SaaS idêntico
+    // --- ENGENHARIA DE MONTAGEM DA STRING DO WHATSAPP (IGUAL AO SEU PADRÃO ANTIGO) ---
+    // Insira aqui o número oficial do WhatsApp de reservas do Hotel de Itaqui (Apenas números com DDD)
+    const NUMERO_WHATSAPP_HOTEL = "5555999999999"; 
+
+    // Formata as datas de YYYY-MM-DD para DD/MM/YYYY na mensagem
+    const fData = (dStr) => dStr.split("-").reverse().join("/");
+
+    const textoMensagem = `*SOLICITAÇÃO DE HOSPEDAGEM - HTI*\n\n` +
+                          `• *ID da Reserva:* #${idNovaReserva}\n` +
+                          `• *Hóspede:* ${inputNome}\n` +
+                          `• *CPF:* ${inputCPF}\n` +
+                          `• *Período:* ${fData(inputEntradaData)} até ${fData(inputSaidaData)}\n` +
+                          `• *Acompanhantes:* ${contagemAcompanhantes}\n` +
+                          `• *Anexos:* ${nomesArquivos.length} arquivo(s) enviado(s)\n\n` +
+                          `_Minha intenção de reserva e documentações já foram transmitidas para o sistema central do hotel._`;
+
+    // Converte o texto para o formato de link de URL seguro
+    const urlWhatsAppFinal = `https://api.whatsapp.com/send?phone=${NUMERO_WHATSAPP_HOTEL}&text=${encodeURIComponent(textoMensagem)}`;
+    
+    // Injeta a URL montada dinamicamente diretamente no botão de ação da tela de sucesso
+    document.getElementById("btnWhatsApp").setAttribute("href", urlWhatsAppFinal);
+
+    // ALTERAÇÃO OPERACIONAL DO DISPARO DE TELA
     document.getElementById("conteudoFormulario").style.display = "none";
     document.getElementById("telaSucesso").style.display = "flex";
     window.scrollTo(0, 0);
