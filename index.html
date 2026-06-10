@@ -222,16 +222,85 @@
             background-color: #14281c;
         }
 
-        .sucesso-tela {
-            display: none;
-            text-align: center;
-            background: white;
-            padding: 40px;
+        /* --- ESTILOS DO CARD DE SUCESSO COPIADOS DO SISTEMA HTI --- */
+        .container-sucesso {
+            display: none; /* Inicia oculto e ativa via JavaScript */
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            padding: 20px;
+        }
+
+        .card-sucesso {
+            background-color: #ffffff;
             border-radius: var(--radius-lg);
             border: 1px solid var(--border-color);
             box-shadow: var(--shadow);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            margin: 0 auto;
         }
-        .sucesso-tela h2 { color: #16a34a; }
+
+        .icon-sucesso-box {
+            width: 64px;
+            height: 64px;
+            background-color: #dcfce7;
+            color: #16a34a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .titulo-sucesso {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .subtitulo-sucesso {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .grupo-botoes {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .btn-sucesso {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-sucesso-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-sucesso-primary:hover {
+            background-color: #14281c;
+        }
     </style>
 </head>
 <body>
@@ -420,11 +489,20 @@
     </form>
 </div>
 
-<div class="container-publico sucesso-tela" id="telaSucesso">
-    <h2>🎉 Solicitação Enviada!</h2>
-    <p>Sua intenção de reserva foi cadastrada com sucesso no sistema do hotel.</p>
-    <p>Nossa equipe revisará o mapa de ocupação e entrará em contato em breve.</p>
-</div>
+<main class="container-sucesso" id="telaSucesso">
+    <div class="card-sucesso">
+        <div class="icon-sucesso-box">✓</div>
+        
+        <div class="texto-sucesso">
+            <h1 class="titulo-sucesso">Operação Concluída!</h1>
+            <p class="subtitulo-sucesso">Sua intenção de reserva e documentações foram processadas com sucesso e as informações já estão ativas no banco de dados do sistema.</p>
+        </div>
+
+        <div class="grupo-botoes">
+            <button onclick="window.location.reload()" class="btn-sucesso btn-sucesso-primary">Nova Solicitação</button>
+        </div>
+    </div>
+</main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -584,7 +662,6 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
     if (inputArquivos && inputArquivos.files.length > 0) {
         btn.innerText = "Fazendo upload dos documentos...";
         for (const arquivo of inputArquivos.files) {
-            // Geração de hash seguro unificado para evitar colisão de nomes na nuvem
             const nomeUnico = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${arquivo.name}`;
             const { data: dataUpload, error: erroUpload } = await supabaseClient.storage
                 .from('documentos-hospedes')
@@ -620,7 +697,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         hospedagem_pet: hospedagemPetSelecionado,
         observacao_pet: document.getElementById("observacao_pet").value,
         leu_nga: leuNgaSelecionado,
-        documentos_digitalizados: nomesArquivos.join(","), // Linha adicionada cirurgicamente
+        documentos_digitalizados: nomesArquivos.join(","),
         status: 'Pendente'
     };
 
@@ -670,8 +747,9 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         }
     }
 
+    // ALTERAÇÃO OPERACIONAL DO DISPARO DE TELA: Oculta o formulário e ativa o Card de Sucesso SaaS idêntico
     document.getElementById("conteudoFormulario").style.display = "none";
-    document.getElementById("telaSucesso").style.display = "block";
+    document.getElementById("telaSucesso").style.display = "flex";
     window.scrollTo(0, 0);
 });
 </script>
