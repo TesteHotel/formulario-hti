@@ -286,13 +286,6 @@
                     <label>Telefone de Contato</label>
                     <input type="text" name="telefone" id="telefone_publico" maxlength="15" placeholder="(00) 90000-0000">
                 </div>
-                <div class="campo" style="grid-column: span 2;">
-                    <label>Anexar Documentação Obrigatória (Identidade / CNH / Boletim / Ordem de Serviço)</label>
-                    <input type="file" id="doc_solicitante" multiple accept=".pdf,.png,.jpg,.jpeg">
-                    <div id="doc_anterior_hospede" style="display:none; color: #16a34a; font-size: 13px; font-weight: 600; margin-top: 4px;">
-                        ✓ Documentação de estada anterior localizada e vinculada automaticamente.
-                    </div>
-                </div>
             </div>
         </fieldset>
 
@@ -427,6 +420,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+// URL corrigida sem a letra 'h' fantasma na rota
 const SUPABASE_URL = 'https://tyubyspelmqgahsdwfr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5dWJ5c3BlbG1xaGdhaHNkd2ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMTcwMTIsImV4cCI6MjA5NjU5MzAxMn0.xZKWcq_w3FgHNRtvezXZhY8xbBWYxTjBMLWCUQ9N-bQ';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -435,9 +429,6 @@ const tipoPessoa = document.getElementById("tipoPessoa");
 const camposMilitar = document.getElementById("camposMilitar");
 const camposCivil = document.getElementById("camposCivil");
 
-// Guarda documentos herdados de estadas anteriores
-let documentosAnterioresHospede = "";
-
 function atualizarTipoPessoa() {
     if (tipoPessoa.value === "Militar") { camposMilitar.style.display = "block"; camposCivil.style.display = "none"; }
     else if (tipoPessoa.value === "Civil") { camposMilitar.style.display = "none"; camposCivil.style.display = "block"; }
@@ -445,7 +436,6 @@ function atualizarTipoPessoa() {
 }
 tipoPessoa.addEventListener("change", atualizarTipoPessoa);
 
-// ATUALIZADO: Inclui o campo de upload exclusivo para cada acompanhante
 function adicionarDependente() {
     const lista = document.getElementById("listaDependentes");
     const div = document.createElement("div");
@@ -455,7 +445,6 @@ function adicionarDependente() {
             <div class="campo"><label>Nome Completo</label><input type="text" class="dep-nome" placeholder="Nome do dependente"></div>
             <div class="campo"><label>Parentesco</label><input type="text" class="dep-parentesco" placeholder="Filho(a), Cônjuge..."></div>
             <div class="campo"><label>Idade</label><input type="number" class="dep-idade" placeholder="0"></div>
-            <div class="campo" style="grid-column: span 3;"><label>Anexar Documento do Acompanhante</label><input type="file" class="dep-doc" accept=".pdf,.png,.jpg,.jpeg"></div>
         </div>
         <button type="button" class="btn-acao-secundario" style="margin-top: 14px; background-color: #fee2e2; color: #dc2626; border-color: #fca5a5;" onclick="this.parentElement.remove()">Remover Acompanhante</button>
     `;
@@ -520,70 +509,19 @@ campoCPFPublico.addEventListener("blur", async function() {
         preencherCampo("telefone_publico", tel);
     }
     
-    // INTEGRAÇÃO INTELIGENTE: Puxa os documentos das estadas passadas para não exigir re-upload
-    if (data.documentos_digitalizados) {
-        documentosAnterioresHospede = data.documentos_digitalizados;
-        document.getElementById("doc_anterior_hospede").style.display = "block";
-    } else {
-        documentosAnterioresHospede = "";
-        document.getElementById("doc_anterior_hospede").style.display = "none";
-    }
-    
     atualizarTipoPessoa();
 });
-
-// FUNÇÃO AUXILIAR: Executa o upload para o Storage do Supabase e retorna o link público
-async function executarUpload(file) {
-    const extensao = file.name.split('.').pop();
-    const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
-    const hashAleatorio = Math.random().toString(36).substring(2, 7);
-    const nomeUnicoArquivo = `${timestamp}_${hashAleatorio}.${extensao}`;
-    
-    const { data, error } = await supabaseClient
-        .storage
-        .from('documentos')
-        .upload(nomeUnicoArquivo, file);
-        
-    if (error) {
-        console.error("Falha no upload técnico do arquivo:", error.message);
-        return null;
-    }
-    
-    const { data: linkPublico } = supabaseClient
-        .storage
-        .from('documentos')
-        .getPublicUrl(nomeUnicoArquivo);
-        
-    return linkPublico.publicUrl;
-}
 
 document.getElementById("formReservaPublica").addEventListener("submit", async function(e) {
     e.preventDefault();
 
     const btn = document.getElementById("btnEnviar");
     btn.disabled = true;
-    btn.innerText = "Processando Arquivos e Enviando...";
+    btn.innerText = "Enviando Solicitação...";
 
     const servicoQuartoSelecionado = document.querySelector('input[name="servico_quarto"]:checked')?.value || "Pela manhã";
     const hospedagemPetSelecionado = document.querySelector('input[name="hospedagem_pet"]:checked')?.value || "Não";
     const leuNgaSelecionado = document.querySelector('input[name="leu_nga"]:checked')?.value || "Não";
-
-    // 1. PROCESSAMENTO DE UPLOAD DOS DOCUMENTOS DO TITULAR
-    const inputDocSolicitante = document.getElementById("doc_solicitante");
-    let linksDosDocumentos = [];
-
-    if (inputDocSolicitante && inputDocSolicitante.files.length > 0) {
-        for (let i = 0; i < inputDocSolicitante.files.length; i++) {
-            const linkArquivo = await executarUpload(inputDocSolicitante.files[i]);
-            if (linkArquivo) linksDosDocumentos.push(linkArquivo);
-        }
-    }
-
-    // Regra de reuso: Se não enviou nada novo mas tem histórico anterior, reaproveita!
-    let stringDocumentosFinais = linksDosDocumentos.join(",");
-    if (stringDocumentosFinais === "" && documentosAnterioresHospede !== "") {
-        stringDocumentosFinais = documentosAnterioresHospede;
-    }
 
     const dadosHospede = {
         cpf: document.getElementById("cpf_publico").value,
@@ -598,10 +536,10 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         forca_militar: document.getElementById("forca_militar").value,
         om_vinculacao: document.getElementById("om_vinculacao").value,
         cargo_funcao: document.getElementById("cargo_funcao").value,
-        lotacao_orgao: document.getElementById("lotacao_orgao").value,
-        documentos_digitalizados: stringDocumentosFinais // Salva o link dos arquivos no perfil fixo
+        lotacao_orgao: document.getElementById("lotacao_orgao").value
     };
 
+    // 1. CONSULTA SE O REGISTRO DO HÓSPEDE EXISTE ANTES DE DEFINIR A OPERAÇÃO
     const { data: hospedeExistente, error: erroBusca } = await supabaseClient
         .from('hospedes')
         .select('id')
@@ -630,7 +568,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         return;
     }
 
-    // 2. CADASTRO DE RESERVAS (Herda os mesmos documentos clicáveis)
+    // 2. CADASTRO DE RESERVAS
     const dadosReserva = {
         cpf: document.getElementById("cpf_publico").value,
         nome_completo: document.getElementById("nome_completo").value,
@@ -652,7 +590,6 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         hospedagem_pet: hospedagemPetSelecionado,
         observacao_pet: document.getElementById("observacao_pet").value,
         leu_nga: leuNgaSelecionado,
-        documentos_digitalizados: stringDocumentosFinais, // Prontos para a recepção abrir
         status: 'Pendente'
     };
 
@@ -670,33 +607,25 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
 
     const idNovaReserva = reservaCriada[0].id;
 
-    // 3. DEPENDENTES E ACOMPANHANTES (COM SEUS RESPECTIVOS ARQUIVOS INDIVIDUAIS)
+    // 3. DEPENDENTES E ACOMPANHANTES
     const caixasDependentes = document.querySelectorAll(".dependente-box");
     if (caixasDependentes.length > 0) {
         const listaParaInserir = [];
         
-        for (let idx = 0; idx < caixasDependentes.length; idx++) {
-            const box = caixasDependentes[idx];
+        caixasDependentes.forEach(box => {
             const nome = box.querySelector(".dep-nome").value;
             const parentesco = box.querySelector(".dep-parentesco").value;
             const idade = box.querySelector(".dep-idade").value;
-            const fileInputDep = box.querySelector(".dep-doc");
 
             if (nome.trim() !== "") {
-                let linkDocAcompanhante = "";
-                if (fileInputDep && fileInputDep.files.length > 0) {
-                    linkDocAcompanhante = await executarUpload(fileInputDep.files[0]);
-                }
-
                 listaParaInserir.push({
                     id_reserva: idNovaReserva,
                     nome: nome,
                     parentesco: parentesco,
-                    idade: idade,
-                    documentos_digitalizados: linkDocAcompanhante // Link direto do anexo do acompanhante
+                    idade: idade
                 });
             }
-        }
+        });
 
         if (listaParaInserir.length > 0) {
             const { error: erroDeps } = await supabaseClient
