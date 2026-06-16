@@ -22,24 +22,22 @@
 
         .topo-publico { 
             text-align: center; 
-            margin-bottom: 32px; 
+            padding-top: 20px;     /* Afasta o topo da página */
+            margin-bottom: 48px;   /* Distância elegante até o primeiro card */
         }
 
-      
+        /* --- LOGOTIPO AJUSTADO: SEM CORTES E COM RESPIRO --- */
         .logo-ht { 
-            width: 100px;             /* Largura ideal para a imagem aparecer bem */
-            height: auto;             /* ALTURA AUTOMÁTICA: Faz com que a imagem nunca seja cortada nas verticais */
-            max-height: 180px;        /* Evita que ela estique demais */
-            margin: 32px auto 24px auto; 
+            width: 180px;             
+            height: auto;             
+            max-height: 180px;        
+            margin: 0 auto 24px auto; 
             display: block; 
-            
-            /* --- REMOÇÃO DO CORTE --- */
-            border-radius: 50%;       /* Um leve arredondamento suave nos cantos em vez de um círculo esmagando a imagem */
-            background-color: #ffffff; /* Garante fundo branco harmônico */
-            padding: 12px;            /* Dá um respiro excelente em volta de toda a logo */
-            
-            object-fit: contain;      /* Força a imagem a ficar 100% visível dentro do espaço */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra suave idêntica para manter o visual premium */
+            border-radius: 8px;       /* Cantos levemente arredondados no card da foto */
+            background-color: #ffffff; 
+            padding: 12px;            /* Moldura de respiro interna */
+            object-fit: contain;      /* Mantém a proporção e impede cortes */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
         }
 
         .topo-publico h1 { 
@@ -236,7 +234,7 @@
             background-color: #14281c;
         }
 
-        /* --- DESIGN ATUALIZADO: CONTAINER DE UPLOAD ESTILIZADO EM SAAS --- */
+        /* --- CONTAINER DE UPLOAD ESTILIZADO EM SAAS --- */
         .area-upload-container {
             border: 2px dashed #cbd5e1;
             border-radius: var(--radius-md);
@@ -266,7 +264,7 @@
             font-size: 13.5px;
             font-weight: 600;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            pointer-events: none; /* Deixa o clique passar pro container pai */
+            pointer-events: none; 
         }
 
         .lista-arquivos-container {
@@ -322,7 +320,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- ESTILOS DO CARD DE SUCESSO COPIADOS DO SISTEMA HTI --- */
+        /* --- ESTILOS DO CARD DE SUCESSO --- */
         .container-sucesso {
             display: none; 
             align-items: center;
@@ -426,7 +424,7 @@
     </header>
 
     <div class="alerta-solicitacao">
-        <strong>⚠️ Importante:</strong><br>
+        <strong>⚠️ Nota Operacional Importante:</strong><br>
         O preenchimento deste formulário digital manifesta uma <strong>intenção de reserva</strong>. A alocação e confirmação final da UH (quarto) dependem estritamente do plano de disponibilidade interna do hotel.
     </div>
 
@@ -436,8 +434,8 @@
             <h2>👤 Dados Gerais do Solicitante</h2>
             <div class="grid-form">
                 <div class="campo">
-                    <label>CPF</label>
-                    <h6>Busca automática caso haja cadastro no sistema</h6>
+                    <label>CPF(Auto-busca)</label>
+                    <h6>Busca automática caso haja cadastro no sistema.</h6>
                     <input type="text" name="cpf" id="cpf_publico" maxlength="14" placeholder="000.000.000-00" required style="font-weight: 600; letter-spacing: 0.05em;">
                 </div>
                 <div class="campo">
@@ -535,7 +533,7 @@
         <fieldset class="card-secao" style="border: 1px solid var(--border-color); margin: 0 0 24px 0;">
             <h2>👥 Acompanhantes e Dependentes</h2>
             <div id="listaDependentes"></div>
-            <button type="button" class="btn-acao-secundario" onclick="adicionarDependente()">Adicionar Acompanhante</button>
+            <button type="button" class="btn-acao-secundario" onclick="adicionarDependente()">+ Adicionar Acompanhante</button>
         </fieldset>
 
         <fieldset class="card-secao" style="border: 1px solid var(--border-color); margin: 0 0 24px 0;">
@@ -585,7 +583,6 @@
                 </div>
                 
                 <input type="file" id="documentos_digitalizados" multiple accept=".pdf,.png,.jpg,.jpeg" style="display: none;">
-                
                 <div class="lista-arquivos-container" id="listaVisualArquivos"></div>
             </div>
         </fieldset>
@@ -629,7 +626,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-
 const SUPABASE_URL = 'https://tyubyspelmqhgahsdwfr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5dWJ5c3BlbG1xaGdhaHNkd2ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMTcwMTIsImV4cCI6MjA5NjU5MzAxMn0.xZKWcq_w3FgHNRtvezXZhY8xbBWYxTjBMLWCUQ9N-bQ';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -722,12 +718,11 @@ campoCPFPublico.addEventListener("blur", async function() {
 });
 
 // --- ENGENHARIA DE ARMAZENAMENTO E GERENCIAMENTO DE FILA DE DOCUMENTOS ---
-let arquivosFila = []; // Array persistente em memória que mantém os arquivos seguros
+let arquivosFila = []; 
 const inputNativo = document.getElementById("documentos_digitalizados");
 const listagemVisual = document.getElementById("listaVisualArquivos");
 const dropZone = document.getElementById("dropZonePublica");
 
-// Impede que re-cliques ou cancelamentos limpem a lista atual de arquivos
 inputNativo.addEventListener("change", function(e) {
     if (e.target.files.length > 0) {
         for (let i = 0; i < e.target.files.length; i++) {
@@ -737,7 +732,6 @@ inputNativo.addEventListener("change", function(e) {
     }
 });
 
-// Suporte para Arrastar e Soltar (Drag & Drop)
 ["dragenter", "dragover"].forEach(nomeEvento => {
     dropZone.addEventListener(nomeEvento, (e) => { e.preventDefault(); dropZone.classList.add("dragover"); }, false);
 });
@@ -772,7 +766,6 @@ window.removerArquivoFila = function(indexAlvo) {
     atualizarVisualizacaoFila();
 };
 
-
 document.getElementById("formReservaPublica").addEventListener("submit", async function(e) {
     e.preventDefault();
 
@@ -780,7 +773,6 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
     btn.disabled = true;
     btn.innerText = "Enviando Solicitação...";
 
-    // Coleta das variáveis textuais para a montagem do WhatsApp posterior
     const inputNome = document.getElementById("nome_completo").value;
     const inputCPF = document.getElementById("cpf_publico").value;
     const inputEntradaData = document.getElementById("data_entrada").value;
@@ -806,7 +798,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         lotacao_orgao: document.getElementById("lotacao_orgao").value
     };
 
-    // 1. SALVAMENTO NA TABELA DE HÓSPEDES (ATUALIZA OU CRIA)
+    // 1. SALVAMENTO NA TABELA DE HÓSPEDES
     const { data: hospedeExistente, error: erroBusca } = await supabaseClient
         .from('hospedes')
         .select('id')
@@ -835,7 +827,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         return;
     }
 
-    // INTERCEPÇÃO DO STORAGE: PROCESSAMENTO DA FILA SEGUNDA A MEMÓRIA DO ARRAY
+    // INTERCEPÇÃO DO STORAGE: ENVIO DA FILA ROBUSTA
     const nomesArquivos = [];
 
     if (arquivosFila.length > 0) {
@@ -854,7 +846,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         }
     }
 
-    // 2. CADASTRO DE RESERVAS (AGORA COM OS ARQUIVOS INTEGRADOS)
+    // 2. CADASTRO DE RESERVAS
     const dadosReserva = {
         cpf: inputCPF,
         nome_completo: inputNome,
@@ -894,7 +886,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
 
     const idNovaReserva = reservaCriada[0].id;
 
-    // 3. DEPENDENTES E ACOMPANHANTES
+    // 3. SALVAMENTO DE DEPENDENTES COMPATÍVEL COM O APP.PY (RESOLVIDO)
     const caixasDependentes = document.querySelectorAll(".dependente-box");
     let contagemAcompanhantes = 0;
     if (caixasDependentes.length > 0) {
@@ -909,10 +901,10 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
                 contagemAcompanhantes++;
                 listaParaInserir.push({
                     id_reserva: idNovaReserva,
-                    name: nome,
-                    nome: nome,
+                    nome: nome,        // Alinhado com o app.py
+                    name: nome,        // Fallback estrutural
                     parentesco: parentesco,
-                    idade: idade
+                    idade: idade ? parseInt(idade) : null // Inteiro puro para evitar quebras no Postgres
                 });
             }
         });
@@ -930,7 +922,6 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
 
     // --- ENGENHARIA DE MONTAGEM DA STRING DO WHATSAPP ---
     const NUMERO_WHATSAPP_HOTEL = "5555991695930"; 
-
     const fData = (dStr) => dStr.split("-").reverse().join("/");
 
     const textoMensagem = `*SOLICITAÇÃO DE HOSPEDAGEM - HTI*\n\n` +
@@ -943,7 +934,6 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
                           `_Minha intenção de reserva e documentações já foram transmitidas para o sistema central do hotel._`;
 
     const urlWhatsAppFinal = `https://api.whatsapp.com/send?phone=${NUMERO_WHATSAPP_HOTEL}&text=${encodeURIComponent(textoMensagem)}`;
-    
     document.getElementById("btnWhatsApp").setAttribute("href", urlWhatsAppFinal);
 
     document.getElementById("conteudoFormulario").style.display = "none";
