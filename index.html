@@ -12,6 +12,7 @@
             color: #1e293b;
             margin: 0;
             padding: 0;
+            min-height: 100vh;
         }
 
         .container-publico {
@@ -19,22 +20,23 @@
             margin: 40px auto;
             padding: 0 20px;
             box-sizing: border-box;
+            width: 100%;
         }
 
         .topo-publico { 
             text-align: center; 
             padding-top: 20px;     
-            margin-bottom: 32px;   
+            margin-bottom: 48px;   
         }
 
-        /* --- LOGOTIPO AJUSTADO --- */
+        /* --- LOGOTIPO AJUSTADO: SEM CORTES --- */
         .logo-ht { 
-            width: 160px;             
+            width: 180px;             
             height: auto;             
-            max-height: 160px;        
+            max-height: 180px;        
             margin: 0 auto 24px auto; 
             display: block; 
-            border-radius: 8px;       
+            border-radius: 20px;       
             background-color: #ffffff; 
             padding: 12px;            
             object-fit: contain;      
@@ -87,6 +89,8 @@
             display: flex; 
             flex-direction: column; 
             gap: 6px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .campo label { 
@@ -128,6 +132,8 @@
             padding: 20px; 
             background: #f8fafc; 
             margin-bottom: 16px; 
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .opcoes { 
@@ -149,6 +155,7 @@
             align-items: center; 
             gap: 10px;
             transition: all 0.2s ease;
+            box-sizing: border-box;
         }
 
         .opcao-card:hover {
@@ -162,6 +169,7 @@
             accent-color: var(--primary);
             cursor: pointer;
             margin: 0;
+            flex-shrink: 0;
         }
 
         .alerta-solicitacao { 
@@ -208,6 +216,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
+            box-sizing: border-box;
         }
 
         .btn-acao-secundario:hover {
@@ -232,13 +241,14 @@
             cursor: pointer;
             box-shadow: var(--shadow-sm);
             transition: background 0.2s ease;
-            width: auto;
+            box-sizing: border-box;
         }
 
         .btn-enviar:hover {
             background-color: #14281c;
         }
 
+        /* --- CONTAINER DE UPLOAD --- */
         .area-upload-container {
             border: 2px dashed #cbd5e1;
             border-radius: var(--radius-md);
@@ -252,6 +262,8 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            box-sizing: border-box;
+            width: 100%;
         }
 
         .area-upload-container:hover, .area-upload-container.dragover {
@@ -277,6 +289,7 @@
             flex-direction: column;
             gap: 8px;
             width: 100%;
+            box-sizing: border-box;
         }
 
         .item-arquivo-fila {
@@ -289,6 +302,8 @@
             border-radius: var(--radius-sm);
             font-size: 13.5px;
             animation: fadeIn 0.2s ease;
+            box-sizing: border-box;
+            width: 100%;
         }
 
         .nome-arquivo-texto {
@@ -313,25 +328,28 @@
             align-items: center;
             justify-content: center;
             transition: background 0.2s ease;
+            flex-shrink: 0;
         }
 
         .btn-remover-arquivo:hover {
             background: #fee2e2;
         }
 
-        /* --- CORREÇÃO OPERACIONAL: CENTRALIZAÇÃO ABSOLUTA DA TELA DE SUCESSO NO PC --- */
+        /* --- DESIGN OPERACIONAL CORRIGIDO: CENTRALIZAÇÃO ABSOLUTA DA TELA DE SUCESSO --- */
         .container-sucesso {
             display: none; 
             align-items: center;
             justify-content: center;
-            min-height: 100vh; /* Altera para vh completo ocupando a viewport */
-            width: 100vw;
+            min-height: 100vh;
+            width: 100%;
             padding: 20px;
             box-sizing: border-box;
-            position: absolute;
+            background-color: #f1f5f9;
+            position: fixed;
             top: 0;
             left: 0;
-            background-color: #f1f5f9;
+            z-index: 9999;
+            overflow-y: auto;
         }
 
         .card-sucesso {
@@ -347,6 +365,7 @@
             flex-direction: column;
             align-items: center;
             gap: 24px;
+            margin: auto;
             box-sizing: border-box;
         }
 
@@ -361,6 +380,7 @@
             justify-content: center;
             font-size: 32px;
             font-weight: bold;
+            flex-shrink: 0;
         }
 
         .titulo-sucesso {
@@ -383,6 +403,7 @@
             gap: 12px;
             width: 100%;
             margin-top: 8px;
+            box-sizing: border-box;
         }
 
         .btn-sucesso {
@@ -395,6 +416,7 @@
             transition: all 0.2s ease;
             box-sizing: border-box;
             width: 100%;
+            display: block;
         }
 
         .btn-sucesso-primary {
@@ -417,48 +439,71 @@
             background-color: #e2e8f0;
         }
 
-        /* ========================================================================= */
-        /* --- ARQUITETURA RESPONSIVA DE ADAPTAÇÃO PARA CELULARES (MÍDIA QUERIES) --- */
-        /* ========================================================================= --> */
+        /* --- DESIGN RESPONSIVO PARA DISPOSITIVOS MÓVEIS (CELULAR) --- */
         @media (max-width: 600px) {
             .container-publico {
                 margin: 16px auto;
                 padding: 0 12px;
             }
 
-            .card-secao {
-                padding: 20px 16px; /* Reduz recuo interno nos cartões */
-                margin-bottom: 16px;
+            .topo-publico {
+                margin-bottom: 24px;
             }
 
             .topo-publico h1 {
-                font-size: 22px; /* Reduz título do hotel para não quebrar linha feio */
+                font-size: 22px;
             }
 
-            .topo-publico .subtitulo {
-                font-size: 14px;
+            .logo-ht {
+                width: 140px;
+                max-height: 140px;
+                margin-bottom: 16px;
+            }
+
+            .card-secao {
+                padding: 24px 16px;
+                margin-bottom: 16px;
+                border-radius: 12px;
             }
 
             .grid-form {
-                grid-template-columns: 1fr; /* Força tudo a virar uma única coluna vertical */
+                grid-template-columns: 1fr;
                 gap: 16px;
             }
 
             .opcoes {
-                grid-template-columns: 1fr; /* Força opções de rádio/check a empilharem */
+                grid-template-columns: 1fr;
                 gap: 10px;
             }
 
-            .botoes-finais, .btn-enviar {
-                width: 100%; /* Botão de envio ocupa a largura inteira do celular */
+            .opcao-card {
+                padding: 12px;
             }
 
-            .btn-enviar {
+            .area-upload-container {
                 padding: 16px;
             }
 
+            .area-upload-container span:last-child {
+                display: none; /* Esconde o texto "ou arraste e solte" no celular */
+            }
+
+            .botoes-finais {
+                justify-content: center;
+            }
+
+            .btn-enviar {
+                width: 100%;
+                padding: 14px 20px;
+            }
+
             .card-sucesso {
-                padding: 32px 20px; /* Adapta cartão de sucesso para telas finas */
+                padding: 32px 16px;
+                gap: 20px;
+            }
+
+            .titulo-sucesso {
+                font-size: 20px;
             }
         }
 
@@ -479,7 +524,7 @@
     </header>
 
     <div class="alerta-solicitacao">
-        <strong>⚠️ Nota Operacional Importante:</strong><br>
+        <strong>⚠️ Importante:</strong><br>
         O preenchimento deste formulário digital manifesta uma <strong>intenção de reserva</strong>. A alocação e confirmação final da UH (quarto) dependem estritamente do plano de disponibilidade interna do hotel.
     </div>
 
@@ -489,8 +534,8 @@
             <h2>👤 Dados Gerais do Solicitante</h2>
             <div class="grid-form">
                 <div class="campo">
-                    <label>CPF(Auto-busca)</label>
-                    <h6>Busca automática caso haja cadastro no sistema.</h6>
+                    <label>CPF</label>
+                    <h6>Busca automática caso haja cadastro no sistema</h6>
                     <input type="text" name="cpf" id="cpf_publico" maxlength="14" placeholder="000.000.000-00" required style="font-weight: 600; letter-spacing: 0.05em;">
                 </div>
                 <div class="campo">
@@ -588,7 +633,7 @@
         <fieldset class="card-secao" style="border: 1px solid var(--border-color); margin: 0 0 24px 0;">
             <h2>👥 Acompanhantes e Dependentes</h2>
             <div id="listaDependentes"></div>
-            <button type="button" class="btn-acao-secundario" onclick="adicionarDependente()">+ Adicionar Acompanhante</button>
+            <button type="button" class="btn-acao-secundario" onclick="adicionarDependente()"> Adicionar Acompanhante</button>
         </fieldset>
 
         <fieldset class="card-secao" style="border: 1px solid var(--border-color); margin: 0 0 24px 0;">
@@ -634,7 +679,7 @@
                 <div class="area-upload-container" id="dropZonePublica" onclick="document.getElementById('documentos_digitalizados').click()">
                     <span style="font-size: 28px; color: #64748b;">📥</span>
                     <button type="button" class="btn-upload-estilizado">Selecionar Arquivos</button>
-                    <span style="font-size: 13px; color: #64748b; @media(max-width:600px){display:none;}">ou arraste e solte os documentos aqui</span>
+                    <span style="font-size: 13px; color: #64748b;">ou arraste e solte os documentos aqui</span>
                 </div>
                 
                 <input type="file" id="documentos_digitalizados" multiple accept=".pdf,.png,.jpg,.jpeg" style="display: none;">
@@ -941,7 +986,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
 
     const idNovaReserva = reservaCriada[0].id;
 
-    // 3. SALVAMENTO DE DEPENDENTES COMPATÍVEL
+    // 3. SALVAMENTO DE DEPENDENTES ALINHADA COM O PROJETO INTERNO
     const caixasDependentes = document.querySelectorAll(".dependente-box");
     let contagemAcompanhantes = 0;
     if (caixasDependentes.length > 0) {
@@ -956,7 +1001,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
                 contagemAcompanhantes++;
                 listaParaInserir.push({
                     id_reserva: idNovaReserva,
-                    nome: nome,        
+                    nome: nome,              
                     parentesco: parentesco,  
                     idade: idade ? parseInt(idade) : null 
                 });
@@ -969,7 +1014,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
                 .insert(listaParaInserir);
 
             if (erroDeps) {
-                console.error("Erro ao salvar acompanhantes no Supabase: ", erroDeps.message);
+                console.error("Erro estrutural ao gravar acompanhantes no Supabase: ", erroDeps.message);
             }
         }
     }
