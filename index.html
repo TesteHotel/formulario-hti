@@ -25,14 +25,21 @@
             margin-bottom: 32px; 
         }
 
+      
         .logo-ht { 
-            width: 90px; 
-            height: 90px; 
-            margin: 0 auto 16px auto; 
+            width: 100px;             /* Largura ideal para a imagem aparecer bem */
+            height: auto;             /* ALTURA AUTOMÁTICA: Faz com que a imagem nunca seja cortada nas verticais */
+            max-height: 180px;        /* Evita que ela estique demais */
+            margin: 32px auto 24px auto; 
             display: block; 
-            border-radius: 50%; 
-            object-fit: cover;
-            box-shadow: var(--shadow); 
+            
+            /* --- REMOÇÃO DO CORTE --- */
+            border-radius: 50%;       /* Um leve arredondamento suave nos cantos em vez de um círculo esmagando a imagem */
+            background-color: #ffffff; /* Garante fundo branco harmônico */
+            padding: 12px;            /* Dá um respiro excelente em volta de toda a logo */
+            
+            object-fit: contain;      /* Força a imagem a ficar 100% visível dentro do espaço */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra suave idêntica para manter o visual premium */
         }
 
         .topo-publico h1 { 
@@ -419,7 +426,7 @@
     </header>
 
     <div class="alerta-solicitacao">
-        <strong>⚠️ Nota Operacional Importante:</strong><br>
+        <strong>⚠️ Importante:</strong><br>
         O preenchimento deste formulário digital manifesta uma <strong>intenção de reserva</strong>. A alocação e confirmação final da UH (quarto) dependem estritamente do plano de disponibilidade interna do hotel.
     </div>
 
@@ -429,8 +436,8 @@
             <h2>👤 Dados Gerais do Solicitante</h2>
             <div class="grid-form">
                 <div class="campo">
-                    <label>CPF(Auto-busca)</label>
-                    <h6>Busca automática caso haja cadastro no sistema.</h6>
+                    <label>CPF</label>
+                    <h6>Busca automática caso haja cadastro no sistema</h6>
                     <input type="text" name="cpf" id="cpf_publico" maxlength="14" placeholder="000.000.000-00" required style="font-weight: 600; letter-spacing: 0.05em;">
                 </div>
                 <div class="campo">
@@ -528,7 +535,7 @@
         <fieldset class="card-secao" style="border: 1px solid var(--border-color); margin: 0 0 24px 0;">
             <h2>👥 Acompanhantes e Dependentes</h2>
             <div id="listaDependentes"></div>
-            <button type="button" class="btn-acao-secundario" onclick="adicionarDependente()">+ Adicionar Acompanhante</button>
+            <button type="button" class="btn-acao-secundario" onclick="adicionarDependente()">Adicionar Acompanhante</button>
         </fieldset>
 
         <fieldset class="card-secao" style="border: 1px solid var(--border-color); margin: 0 0 24px 0;">
