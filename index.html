@@ -566,6 +566,14 @@
                     <label>Telefone de Contato</label>
                     <input type="text" name="telefone" id="telefone_publico" maxlength="15" placeholder="(00) 90000-0000">
                 </div>
+                <div class="campo">
+                    <label>Nº da Identidade (RG)</label>
+                    <input type="text" name="identidade" id="identidade_publico" placeholder="Ex: 0000000000" required>
+                </div>
+                <div class="campo">
+                    <label>Órgão Expedidor</label>
+                    <input type="text" name="orgao_expedidor" id="orgao_expedidor_publico" placeholder="Ex: SSP/RS" required>
+                </div>
             </div>
         </fieldset>
 
@@ -806,6 +814,8 @@ campoCPFPublico.addEventListener("blur", async function() {
     preencherCampo("cidade_origem", data.cidade_origem);
     preencherCampo("uf", data.uf);
     preencherCampo("email", data.email);
+    preencherCampo("identidade_publico", data.identidade);
+    preencherCampo("orgao_expedidor_publico", data.orgao_expedidor);
     
     if (data.telefone) {
         let tel = data.telefone.replace(/\D/g, "");
@@ -895,7 +905,9 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         forca_militar: document.getElementById("forca_militar").value,
         om_vinculacao: document.getElementById("om_vinculacao").value,
         cargo_funcao: document.getElementById("cargo_funcao").value,
-        lotacao_orgao: document.getElementById("lotacao_orgao").value
+        lotacao_orgao: document.getElementById("lotacao_orgao").value,
+        identidade: document.getElementById("identidade_publico").value,
+        orgao_expedidor: document.getElementById("orgao_expedidor_publico").value
     };
 
     // 1. SALVAMENTO NA TABELA DE HÓSPEDES
@@ -961,6 +973,8 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         om_vinculacao: document.getElementById("om_vinculacao").value,
         cargo_funcao: document.getElementById("cargo_funcao").value,
         lotacao_orgao: document.getElementById("lotacao_orgao").value,
+        identidade: document.getElementById("identidade_publico").value,
+        orgao_expedidor: document.getElementById("orgao_expedidor_publico").value,
         data_entrada: inputEntradaData,
         data_saida: inputSaidaData,
         servico_quarto: servicoQuartoSelecionado,
