@@ -3,375 +3,1059 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserva Online — Hotel de Trânsito de Itaqui</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Solicitação de Hospedagem - Hotel de Trânsito de Itaqui</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        /* --- ARQUITETURA DE DESIGN RESPONSIVO E UX MILITAR --- */
-        :root {
-            --primary: #1f3d2b;
-            --primary-light: #e9efea;
-            --bg-system: #f8fafc;
-            --bg-card: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body {
-            background-color: var(--bg-system);
-            color: var(--text-main);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        body { 
+            background-color: #f1f5f9; 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: #1e293b;
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
         }
 
         .container-publico {
+            max-width: 760px;
+            margin: 40px auto;
+            padding: 0 20px;
+            box-sizing: border-box;
             width: 100%;
-            max-width: 680px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 32px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            margin: 20px;
+        }
+
+        .topo-publico { 
+            text-align: center; 
+            padding-top: 20px;     
+            margin-bottom: 48px;   
+        }
+
+        /* --- LOGOTIPO AJUSTADO: SEM CORTES --- */
+        .logo-ht { 
+            width: 180px;             
+            height: auto;             
+            max-height: 180px;        
+            margin: 0 auto 24px auto; 
+            display: block; 
+            border-radius: 20px;       
+            background-color: #ffffff; 
+            padding: 12px;            
+            object-fit: contain;      
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+        }
+
+        .topo-publico h1 { 
+            color: var(--primary); 
+            font-size: 28px; 
+            font-weight: 800; 
+            margin: 0; 
+            letter-spacing: -0.02em;
+        }
+
+        .subtitulo { 
+            color: var(--text-muted); 
+            font-size: 15px; 
+            margin: 6px 0 0 0; 
+            font-weight: 500;
+        }
+
+        .card-secao { 
+            background: #ffffff; 
+            border-radius: var(--radius-lg); 
+            padding: 32px; 
+            border: 1px solid var(--border-color); 
+            margin-bottom: 24px; 
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-secao h2 { 
+            margin-top: 0; 
+            font-size: 18px; 
+            color: var(--text-main); 
+            border-bottom: 1px solid var(--border-color); 
+            padding-bottom: 12px; 
+            margin-bottom: 24px; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .grid-form { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 20px; 
+        }
+
+        .campo { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 6px;
+            width: 100%;
             box-sizing: border-box;
         }
 
-        .header-form {
-            text-align: center;
-            margin-bottom: 28px;
-            border-bottom: 1px dashed var(--border-color);
-            padding-bottom: 20px;
-        }
-
-        .header-form img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 12px;
-        }
-
-        .header-form h1 {
-            font-size: 24px;
-            color: var(--primary);
-            margin: 0 0 6px 0;
-            font-weight: 800;
-        }
-
-        .header-form p {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin: 0;
-        }
-
-        .grid-form {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        @media (max-width: 600px) {
-            .grid-form {
-                grid-template-columns: 1fr;
-            }
-            .container-publico {
-                padding: 20px;
-            }
-        }
-
-        .form-group-saas {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 16px;
-        }
-
-        .form-group-saas.full-width {
-            grid-column: span 2;
-        }
-
-        @media (max-width: 600px) {
-            .form-group-saas.full-width {
-                grid-column: span 1;
-            }
-        }
-
-        .form-group-saas label {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-main);
+        .campo label { 
+            font-weight: 600; 
+            color: var(--text-main); 
+            font-size: 13px; 
             text-transform: uppercase;
             letter-spacing: 0.03em;
         }
 
-        .input-saas {
-            width: 100%;
+        .campo h6 {
+            margin: 0 0 4px 0;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .campo input, .campo select, .campo textarea {
             padding: 11px 14px;
             border: 1px solid var(--border-color);
             border-radius: var(--radius-sm);
             background-color: #ffffff;
-            font-size: 14px;
             color: var(--text-main);
-            box-sizing: border-box;
-            transition: var(--transition);
+            font-size: 14px;
             outline: none;
-        }
-
-        .input-saas:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(31, 61, 43, 0.1);
-        }
-
-        .btn-submit-publico {
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
             width: 100%;
+            box-sizing: border-box;
+        }
+
+        .campo input:focus, .campo select:focus, .campo textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(20, 40, 28, 0.1);
+        }
+
+        .dependente-box { 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius-md); 
+            padding: 20px; 
+            background: #f8fafc; 
+            margin-bottom: 16px; 
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .opcoes { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+            gap: 12px; 
+            margin-top: 6px; 
+        }
+
+        .opcao-card { 
+            background: #ffffff; 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius-sm); 
+            padding: 14px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            color: var(--text-main); 
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .opcao-card:hover {
+            border-color: var(--primary);
+            background-color: #f8fafc;
+        }
+
+        .opcao-card input[type="radio"], .opcao-card input[type="checkbox"] { 
+            width: 18px; 
+            height: 18px; 
+            accent-color: var(--primary);
+            cursor: pointer;
+            margin: 0;
+            flex-shrink: 0;
+        }
+
+        .alerta-solicitacao { 
+            background: #fffbeb; 
+            border-left: 4px solid #d97706; 
+            padding: 16px 20px; 
+            border-radius: var(--radius-md); 
+            color: #92400e; 
+            font-size: 14px; 
+            margin-bottom: 24px; 
+            border: 1px solid #fef3c7; 
+            line-height: 1.5;
+        }
+
+        .aviso { 
+            background: #f0fdf4; 
+            border-left: 4px solid #16a34a; 
+            padding: 14px 18px; 
+            border-radius: var(--radius-sm); 
+            color: #166534; 
+            font-size: 13.5px; 
+            border: 1px solid #dcfce7;
+        }
+
+        .link-nga { 
+            color: var(--primary); 
+            font-weight: 700; 
+            text-decoration: none;
+            border-bottom: 2px solid var(--primary-light);
+            transition: border-color 0.2s ease;
+        }
+        
+        .link-nga:hover {
+            border-color: var(--primary);
+        }
+
+        .btn-acao-secundario {
+            padding: 10px 16px;
+            background: #ffffff;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .btn-acao-secundario:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .botoes-finais { 
+            display: flex; 
+            justify-content: flex-end; 
+            margin-top: 12px; 
+        }
+
+        .btn-enviar {
+            padding: 14px 32px;
             background-color: var(--primary);
             color: white;
             border: none;
-            padding: 14px;
             border-radius: var(--radius-sm);
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-            margin-top: 12px;
+            box-shadow: var(--shadow-sm);
+            transition: background 0.2s ease;
+            box-sizing: border-box;
         }
 
-        .btn-submit-publico:hover {
+        .btn-enviar:hover {
             background-color: #14281c;
         }
 
-        .btn-submit-publico:disabled {
-            background-color: var(--text-muted);
-            cursor: not-allowed;
-            opacity: 0.6;
+        /* --- CONTAINER DE UPLOAD --- */
+        .area-upload-container {
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--radius-md);
+            padding: 24px;
+            background-color: #f8fafc;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-sizing: border-box;
+            width: 100%;
         }
 
-        .secao-titulo-interna {
-            grid-column: span 2;
-            font-size: 13px;
-            font-weight: 800;
-            color: var(--primary);
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 4px;
-            margin-top: 10px;
-            margin-bottom: 4px;
-            letter-spacing: 0.04em;
+        .area-upload-container:hover, .area-upload-container.dragover {
+            border-color: var(--primary);
+            background-color: #f0fdf4;
         }
 
+        .btn-upload-estilizado {
+            padding: 10px 20px;
+            background-color: #ffffff;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            font-weight: 600;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            pointer-events: none; 
+        }
+
+        .lista-arquivos-container {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .item-arquivo-fila {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            animation: fadeIn 0.2s ease;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .nome-arquivo-texto {
+            color: var(--text-main);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80%;
+        }
+
+        .btn-remover-arquivo {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-remover-arquivo:hover {
+            background: #fee2e2;
+        }
+
+        /* --- DESIGN OPERACIONAL CORRIGIDO: CENTRALIZAÇÃO ABSOLUTA DA TELA DE SUCESSO --- */
+        .container-sucesso {
+            display: none; 
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #f1f5f9;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            overflow-y: auto;
+        }
+
+        .card-sucesso {
+            background-color: #ffffff;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            margin: auto;
+            box-sizing: border-box;
+        }
+
+        .icon-sucesso-box {
+            width: 64px;
+            height: 64px;
+            background-color: #dcfce7;
+            color: #16a34a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .titulo-sucesso {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .subtitulo-sucesso {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .grupo-botoes {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            margin-top: 8px;
+            box-sizing: border-box;
+        }
+
+        .btn-sucesso {
+            padding: 14px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+            width: 100%;
+            display: block;
+        }
+
+        .btn-sucesso-primary {
+            background-color: #25d366; 
+            color: white;
+            border: none;
+        }
+
+        .btn-sucesso-primary:hover {
+            background-color: #128c7e;
+        }
+
+        .btn-sucesso-secondary {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-sucesso-secondary:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* --- DESIGN RESPONSIVO PARA DISPOSITIVOS MÓVEIS (CELULAR) --- */
         @media (max-width: 600px) {
-            .secao-titulo-interna {
-                grid-column: span 1;
+            .container-publico {
+                margin: 16px auto;
+                padding: 0 12px;
             }
+
+            .topo-publico {
+                margin-bottom: 24px;
+            }
+
+            .topo-publico h1 {
+                font-size: 22px;
+            }
+
+            .logo-ht {
+                width: 140px;
+                max-height: 140px;
+                margin-bottom: 16px;
+            }
+
+            .card-secao {
+                padding: 24px 16px;
+                margin-bottom: 16px;
+                border-radius: 12px;
+            }
+
+            .grid-form {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .opcoes {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .opcao-card {
+                padding: 12px;
+            }
+
+            .area-upload-container {
+                padding: 16px;
+            }
+
+            .area-upload-container span:last-child {
+                display: none; /* Esconde o texto "ou arraste e solte" no celular */
+            }
+
+            .botoes-finais {
+                justify-content: center;
+            }
+
+            .btn-enviar {
+                width: 100%;
+                padding: 14px 20px;
+            }
+
+            .card-sucesso {
+                padding: 32px 16px;
+                gap: 20px;
+            }
+
+            .titulo-sucesso {
+                font-size: 20px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(2px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
-    <div class="container-publico">
-        <div class="header-form">
-            <img src="/static/Logo HTI - novo.jpg" alt="Logo HTI" onerror="this.src='https://placehold.co/100x100?text=HTI'">
-            <h1>Solicitação de Reserva Online</h1>
-            <p>Hotel de Trânsito de Itaqui — Envie sua intenção de estada institucional.</p>
-        </div>
+<div class="container-publico" id="conteudoFormulario">
+    
+    <header class="topo-publico">
+        <img src="Logo HTI - novo.jpg" class="logo-ht">
+        <h1>Solicitação de Hospedagem</h1>
+        <p class="subtitulo">Hotel de Trânsito de Itaqui</p>
+    </header>
 
-        <form id="formReservaPublica">
+    <div class="alerta-solicitacao">
+        <strong>⚠️ Importante:</strong><br>
+        O preenchimento deste formulário digital manifesta uma <strong>intenção de reserva</strong>. A alocação e confirmação final da UH (quarto) dependem estritamente do plano de disponibilidade interna do hotel.
+    </div>
+
+    <form id="formReservaPublica">
+        
+        <fieldset class="card-secao" style="border: 1px solid var(--border-color); margin: 0 0 24px 0;">
+            <h2>👤 Dados Gerais do Solicitante</h2>
             <div class="grid-form">
-                
-                <div class="secao-titulo-interna">Dados Básicos Cadastrais</div>
-
-                <div class="form-group-saas full-width">
-                    <label>Nome Completo</label>
-                    <input type="text" id="nome_completo" class="input-saas" placeholder="Digite seu nome completo" required>
-                </div>
-
-                <div class="form-group-saas">
+                <div class="campo">
                     <label>CPF</label>
-                    <input type="text" id="cpf" class="input-saas" placeholder="000.000.000-00" required>
+                    <h6>Busca automática caso haja cadastro no sistema</h6>
+                    <input type="text" name="cpf" id="cpf_publico" maxlength="14" placeholder="000.000.000-00" required style="font-weight: 600; letter-spacing: 0.05em;">
                 </div>
-
-                <div class="form-group-saas">
-                    <label>Telefone / WhatsApp</label>
-                    <input type="text" id="telefone" class="input-saas" placeholder="(00) 00000-0000" required>
+                <div class="campo">
+                    <label>Nome Completo</label>
+                    <input type="text" name="nome_completo" id="nome_completo" placeholder="Insira seu nome completo" required>
                 </div>
-
-                <div class="form-group-saas full-width">
-                    <label>Email para Contato</label>
-                    <input type="email" id="email" class="input-saas" placeholder="seuemail@provedor.com" required>
-                </div>
-
-                <div class="secao-titulo-interna">Vínculo Institucional</div>
-
-                <div class="form-group-saas">
-                    <label>Categoria de Vínculo</label>
-                    <select id="tipo_persona" class="input-saas" required>
-                        <option value="Militar" selected>Militar</option>
+                <div class="campo">
+                    <label>Vínculo Institucional</label>
+                    <select id="tipoPessoa" name="tipo_pessoa" required>
+                        <option value="">Selecione uma opção</option>
+                        <option value="Militar">Militar</option>
                         <option value="Civil">Civil</option>
                     </select>
                 </div>
-
-                <div class="form-group-saas">
-                    <label>Posto / Graduação</label>
-                    <input type="text" id="posto_graduacao" class="input-saas" placeholder="Ex: Capitão, Sargento, Civil...">
+                <div class="campo">
+                    <label>Cidade de Origem</label>
+                    <input type="text" name="cidade_origem" id="cidade_origem" placeholder="Ex: Porto Alegre">
                 </div>
+                <div class="campo">
+                    <label>UF</label>
+                    <input type="text" name="uf" id="uf" maxlength="2" placeholder="RS" style="text-transform: uppercase;">
+                </div>
+                <div class="campo">
+                    <label>E-mail Corporativo/Pessoal</label>
+                    <input type="email" name="email" id="email" placeholder="nome@provedor.com">
+                </div>
+                <div class="campo">
+                    <label>Telefone de Contato</label>
+                    <input type="text" name="telefone" id="telefone_publico" maxlength="15" placeholder="(00) 90000-0000">
+                </div>
+                <div class="campo">
+                    <label>Nº da Identidade (RG)</label>
+                    <input type="text" name="identidade" id="identidade_publico" placeholder="Ex: 0000000000" required>
+                </div>
+                <div class="campo">
+                    <label>Órgão Expedidor</label>
+                    <input type="text" name="orgao_expedidor" id="orgao_expedidor_publico" placeholder="Ex: SSP/RS" required>
+                </div>
+            </div>
+        </fieldset>
 
-                <div class="form-group-saas">
+        <fieldset class="card-secao" id="camposMilitar" style="border: 1px solid var(--border-color); margin: 0 0 24px 0; display:none;">
+            <h2>🪖 Informações de Caráter Militar</h2>
+            <div class="grid-form">
+                <div class="campo">
+                    <label>Posto / Graduação</label>
+                    <input type="text" name="posto_graduacao" id="posto_graduacao" placeholder="Ex: 1º Ten, Sgt...">
+                </div>
+                <div class="campo">
+                    <label>Situação</label>
+                    <select name="situacao_militar" id="situacao_militar">
+                        <option value="">Selecione</option>
+                        <option value="Ativa">Ativa</option>
+                        <option value="Reserva">Reserva / Reformado</option>
+                    </select>
+                </div>
+                <div class="campo">
                     <label>Força Vinculada</label>
-                    <select id="forca_militar" class="input-saas">
-                        <option value="">Selecione se aplicável</option>
-                        <option value="Exército Brasileiro">Exército Brasileiro</option>
+                    <select name="forca_militar" id="forca_militar">
+                        <option value="">Selecione</option>
                         <option value="Marinha do Brasil">Marinha do Brasil</option>
+                        <option value="Exército Brasileiro">Exército Brasileiro</option>
                         <option value="Força Aérea Brasileira">Força Aérea Brasileira</option>
                         <option value="Força Auxiliar">Força Auxiliar (PM / BM)</option>
-                        <option value="Civil">Não aplicável (Civil)</option>
+                        <option value="Nações Amigas">Forças de Nações Amigas</option>
                     </select>
                 </div>
-
-                <div class="form-group-saas">
-                    <label>OM / Organização Vinculada</label>
-                    <input type="text" id="om_vinculacao" class="input-saas" placeholder="Ex: 1º RC Mec">
+                <div class="campo">
+                    <label>Organização Militar (OM)</label>
+                    <input type="text" name="om_vinculacao" id="om_vinculacao" placeholder="Ex: 1º RC Mec">
                 </div>
-
-                <div class="secao-titulo-interna">Planejamento da Estada</div>
-
-                <div class="form-group-saas">
-                    <label>Data de Entrada (Check-in)</label>
-                    <input type="date" id="data_entrada" class="input-saas" required>
-                </div>
-
-                <div class="form-group-saas">
-                    <label>Data de Saída (Check-out)</label>
-                    <input type="date" id="data_saida" class="input-saas" required>
-                </div>
-
-                <div class="form-group-saas">
-                    <label>Cidade de Origem</label>
-                    <input type="text" id="cidade_origem" class="input-saas" placeholder="Ex: Porto Alegre">
-                </div>
-
-                <div class="form-group-saas">
-                    <label>UF</label>
-                    <input type="text" id="uf" class="input-saas" placeholder="RS" maxlength="2">
-                </div>
-
-                <div class="form-group-saas full-width">
-                    <label>Preferência de Serviço de Quarto</label>
-                    <select id="servico_quarto" class="input-saas">
-                        <option value="Pela manhã">Pela manhã</option>
-                        <option value="Pela tarde">Pela tarde</option>
-                        <option value="Somente mediante solicitação" selected>Somente mediante solicitação</option>
-                        <option value="Não deseja">Não deseja</option>
-                    </select>
-                </div>
-
-                <div class="form-group-saas">
-                    <label>Hospedagem com Animal (PET)?</label>
-                    <select id="hospedagem_pet" class="input-saas">
-                        <option value="Não" selected>Não</option>
-                        <option value="Sim">Sim</option>
-                    </select>
-                </div>
-
-                <div class="form-group-saas">
-                    <label>Ciência das Normas (NGA)?</label>
-                    <select id="leu_nga" class="input-saas" required>
-                        <option value="Sim" selected>Sim, declaro ciência</option>
-                        <option value="Não">Não</option>
-                    </select>
-                </div>
-
-                <div class="form-group-saas full-width">
-                    <label>Restrições Alimentares / Observações para o Café</label>
-                    <textarea id="alergia_cafe" class="input-saas" rows="2" placeholder="Informe alergias ou restrições alimentares, se houver..."></textarea>
-                </div>
-
             </div>
+        </fieldset>
 
-            <button type="submit" id="btnSubmit" class="btn-submit-publico">Enviar Intenção de Reserva</button>
-        </form>
+        <fieldset class="card-secao" id="camposCivil" style="border: 1px solid var(--border-color); margin: 0 0 24px 0; display:none;">
+            <h2>💼 Informações Profissionais (Civil)</h2>
+            <div class="grid-form">
+                <div class="campo">
+                    <label>Cargo / Função</label>
+                    <input type="text" name="cargo_funcao" id="cargo_funcao" placeholder="Ex: Analista, Diretor...">
+                </div>
+                <div class="campo">
+                    <label>Lotação / Órgão Vinculado</label>
+                    <input type="text" name="lotacao_orgao" id="lotacao_orgao" placeholder="Ex: Ministério da Defesa">
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="card-secao" style="border: 1px solid var(--border-color); margin: 0 0 24px 0;">
+            <h2>📅 Período da Estada Pretendida</h2>
+            <div class="grid-form">
+                <div class="campo">
+                    <label>Previsão de Entrada (Check-in)</label>
+                    <input type="date" id="data_entrada" name="data_entrada" required>
+                </div>
+                <div class="campo">
+                    <label>Previsão de Saída (Check-out)</label>
+                    <input type="date" id="data_saida" name="data_saida" required>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="card-secao" style="border: 1px solid var(--border-color); margin: 0 0 24px 0;">
+            <h2>👥 Acompanhantes e Dependentes</h2>
+            <div id="listaDependentes"></div>
+            <button type="button" class="btn-acao-secundario" onclick="adicionarDependente()"> Adicionar Acompanhante</button>
+        </fieldset>
+
+        <fieldset class="card-secao" style="border: 1px solid var(--border-color); margin: 0 0 24px 0;">
+            <h2>🧹 Preferência de Serviço de Quarto</h2>
+            <div class="opcoes">
+                <label class="opcao-card"><input type="radio" name="servico_quarto" value="Pela manhã" checked> Manhã</label>
+                <label class="opcao-card"><input type="radio" name="servico_quarto" value="Pela tarde"> Tarde</label>
+                <label class="opcao-card"><input type="radio" name="servico_quarto" value="Somente mediante solicitação"> Sob demanda</label>
+                <label class="opcao-card"><input type="radio" name="servico_quarto" value="Não deseja"> Dispensável</label>
+            </div>
+        </fieldset>
+
+        <fieldset class="card-secao" style="border: 1px solid var(--border-color); margin: 0 0 24px 0;">
+            <h2>☕ Café da Manhã</h2>
+            <div class="aviso">
+                ℹ️ O café da manhã regulamentar do hotel é servido diariamente das <strong>07h00 às 09h30</strong> na Sala de Refeições.
+            </div>
+            <br>
+            <div class="campo">
+                <label>Restrições Médicas ou Alergias Alimentares</label>
+                <textarea name="alergia_cafe" id="alergia_cafe" rows="3" placeholder="Informe aqui caso possua alguma intolerância, alergia ou restrição específica alimentar..."></textarea>
+            </div>
+        </fieldset>
+
+        <fieldset class="card-secao" style="border: 1px solid var(--border-color); margin: 0 0 24px 0;">
+            <h2>🐾 Hospedagem com Animal de Estimação (PET)</h2>
+            <div class="opcoes">
+                <label class="opcao-card"><input type="radio" name="hospedagem_pet" value="Sim"> Sim</label>
+                <label class="opcao-card"><input type="radio" name="hospedagem_pet" value="Não" checked> Não</label>
+            </div>
+            <br>
+            <div class="campo">
+                <label>Especificações do Animal (Porte / Raça / Canino ou Felino)</label>
+                <textarea name="observacao_pet" id="observacao_pet" rows="3" placeholder="Caso tenha marcado 'Sim', descreva o porte e espécie do pet para validação de UH compatível."></textarea>
+            </div>
+        </fieldset>
+
+        <fieldset class="card-secao" style="border: 1px solid var(--border-color); margin: 0 0 24px 0;">
+            <h2>📁 Documentações Digitais Anexadas</h2>
+            <div class="campo">
+                <label>Fazer Upload de Documentos Identidade / CNH / OM (PDF, PNG, JPG)</label>
+                
+                <div class="area-upload-container" id="dropZonePublica" onclick="document.getElementById('documentos_digitalizados').click()">
+                    <span style="font-size: 28px; color: #64748b;">📥</span>
+                    <button type="button" class="btn-upload-estilizado">Selecionar Arquivos</button>
+                    <span style="font-size: 13px; color: #64748b;">ou arraste e solte os documentos aqui</span>
+                </div>
+                
+                <input type="file" id="documentos_digitalizados" multiple accept=".pdf,.png,.jpg,.jpeg" style="display: none;">
+                <div class="lista-arquivos-container" id="listaVisualArquivos"></div>
+            </div>
+        </fieldset>
+
+        <fieldset class="card-secao" style="border: 1px solid var(--border-color); margin: 0 0 24px 0;">
+            <h2>⚖️ Declaração de Ciência e Termos</h2>
+            <p style="font-size: 14px; line-height: 1.5; color: #475569; margin-bottom: 16px;">
+                O hóspede declara estar ciente de que a estada é regida pelas Normas Gerais de Ação (NGA) do Hotel de Trânsito de Itaqui, devendo zelar pelo patrimônio público e cumprir as regras internas estipuladas.
+            </p>
+            <div style="margin-bottom: 20px;">
+                <a href="Normas Gerais de Ação (NGA) HTI 2025.pdf" target="_blank" class="link-nga">📖 Ler Normas Gerais de Ação (NGA) do Estabelecimento</a>
+            </div>
+            <label class="checkbox-declaracao opcao-card" style="cursor: pointer;">
+                <input type="checkbox" name="leu_nga" value="Sim" required> 
+                <span>Confirmo a leitura completa e aceito os termos técnicos da NGA.</span>
+            </label>
+        </fieldset>
+
+        <div class="botoes-finais">
+            <button type="submit" id="btnEnviar" class="btn-enviar">Submeter Intenção de Reserva</button>
+        </div>
+    </form>
+</div>
+
+<main class="container-sucesso" id="telaSucesso">
+    <div class="card-sucesso">
+        <div class="icon-sucesso-box">✓</div>
+        
+        <div class="texto-sucesso">
+            <h1 class="titulo-sucesso">Operação Concluída!</h1>
+            <p class="subtitulo-sucesso" style="margin-top: 10px;">Sua solicitação e anexos foram salvos. Clique no botão abaixo para enviar a solicitação via WhatsApp para o setor de reservas do hotel.</p>
+        </div>
+
+        <div class="grupo-botoes">
+            <a id="btnWhatsApp" target="_blank" class="btn-sucesso btn-sucesso-primary">💬 Enviar via WhatsApp</a>
+            <button onclick="window.location.reload()" class="btn-sucesso btn-sucesso-secondary">Fazer Nova Solicitação</button>
+        </div>
     </div>
+</main>
 
-    <script>
-        // CREDENCIAIS DA CONEXÃO DA CAMADA WEB DO HTI
-        const SUPABASE_URL = "https://db.tyubyspelmqhgahsdwfr.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiLnR5dWJ5c3BlbG1xa2dhaHNkd2ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTM1NTAyODAsImV4cCI6MjAyOTEwNjI4MH0.your-actual-signature-here"; 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        // Inicializando o cliente global do Supabase
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script>
+const SUPABASE_URL = 'https://tyubyspelmqhgahsdwfr.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5dWJ5c3BlbG1xaGdhaHNkd2ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMTcwMTIsImV4cCI6MjA5NjU5MzAxMn0.xZKWcq_w3FgHNRtvezXZhY8xbBWYxTjBMLWCUQ9N-bQ';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const form = document.getElementById("formReservaPublica");
-        const btnSubmit = document.getElementById("btnSubmit");
+const tipoPessoa = document.getElementById("tipoPessoa");
+const camposMilitar = document.getElementById("camposMilitar");
+const camposCivil = document.getElementById("camposCivil");
 
-        form.addEventListener("submit", async function(e) {
-            e.preventDefault();
+function atualizarTipoPessoa() {
+    if (tipoPessoa.value === "Militar") { camposMilitar.style.display = "block"; camposCivil.style.display = "none"; }
+    else if (tipoPessoa.value === "Civil") { camposMilitar.style.display = "none"; camposCivil.style.display = "block"; }
+    else { camposMilitar.style.display = "none"; camposCivil.style.display = "none"; }
+}
+tipoPessoa.addEventListener("change", atualizarTipoPessoa);
 
-            // Bloqueia clique duplo acidental durante a transmissão
-            btnSubmit.innerHTML = 'Processando e Enviando...';
-            btnSubmit.disabled = true;
+function adicionarDependente() {
+    const lista = document.getElementById("listaDependentes");
+    const div = document.createElement("div");
+    div.className = "dependente-box";
+    div.innerHTML = `
+        <div class="grid-form">
+            <div class="campo"><label>Nome Completo</label><input type="text" class="dep-nome" placeholder="Nome do dependente"></div>
+            <div class="campo"><label>Parentesco</label><input type="text" class="dep-parentesco" placeholder="Filho(a), Cônjuge..."></div>
+            <div class="campo"><label>Idade</label><input type="number" class="dep-idade" placeholder="0"></div>
+        </div>
+        <button type="button" class="btn-acao-secundario" style="margin-top: 14px; background-color: #fee2e2; color: #dc2626; border-color: #fca5a5;" onclick="this.parentElement.remove()">Remover Acompanhante</button>
+    `;
+    lista.appendChild(div);
+}
 
-            // Formatação e agrupamento estrutural dos dados informados pelo hóspede
-            const dadosReserva = {
-                nome_completo: document.getElementById("nome_completo").value,
-                cpf: document.getElementById("cpf").value,
-                telefone: document.getElementById("telefone").value,
-                email: document.getElementById("email").value,
-                tipo_pessoa: document.getElementById("tipo_persona").value,
-                posto_graduacao: document.getElementById("posto_graduacao").value || null,
-                forca_militar: document.getElementById("forca_militar").value || null,
-                om_vinculacao: document.getElementById("om_vinculacao").value || null,
-                data_entrada: document.getElementById("data_entrada").value,
-                data_saida: document.getElementById("data_saida").value,
-                cidade_origem: document.getElementById("cidade_origem").value || null,
-                uf: document.getElementById("uf").value ? document.getElementById("uf").value.toUpperCase() : null,
-                servico_quarto: document.getElementById("servico_quarto").value,
-                hospedagem_pet: document.getElementById("hospedagem_pet").value,
-                leu_nga: document.getElementById("leu_nga").value,
-                alergia_cafe: document.getElementById("alergia_cafe").value || null,
-                status: "Pendente", // Toda reserva web inicia sob validação humana da recepção
-                data_solicitacao: new Date().toLocaleDateString('pt-BR')
-            };
+function preencherCampo(id, valor) { const c = document.getElementById(id); if (c) c.value = valor || ""; }
 
-            try {
-                console.log("Iniciando inserção tática de dados de reserva...");
+const campoCPFPublico = document.getElementById("cpf_publico");
+if (campoCPFPublico) {
+    campoCPFPublico.addEventListener("input", function(e) {
+        let v = e.target.value.replace(/\D/g, "");
+        if (v.length > 11) v = v.substring(0, 11);
+        if (v.length > 9) v = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4");
+        else if (v.length > 6) v = v.replace(/^(\d{3})(\d{3})(\d{1,3})$/, "$1.$2.$3");
+        else if (v.length > 3) v = v.replace(/^(\d{3})(\d{1,3})$/, "$1.$2");
+        e.target.value = v;
+    });
+}
 
-                /* PROTEÇÃO CONTRA VAZAMENTOS: 
-                   Executamos apenas o método .insert(). Removemos o modificador .select() daqui de forma definitiva. 
-                   Isso faz com que o navegador apenas envie as informações. Sem permissão de leitura, o banco rejeitaria o .select(), 
-                   mas aceita o empurrão cego de dados com sucesso total!
-                */
-                const { error: erroReserva } = await supabaseClient
-                    .from('reservas')
-                    .insert([dadosReserva]);
+const campoTelefonePublico = document.getElementById("telefone_publico");
+if (campoTelefonePublico) {
+    campoTelefonePublico.addEventListener("input", function(e) {
+        let v = e.target.value.replace(/\D/g, "");
+        if (v.length > 11) v = v.substring(0, 11);
+        if (v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+        else if (v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3");
+        else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,4})$/, "($1) $2");
+        else if (v.length > 0) v = `(${v}`;
+        e.target.value = v;
+    });
+}
 
-                if (erroReserva) {
-                    console.error("Inconsistência reportada pelo banco:", erroReserva);
-                    alert("Erro ao submeter intenção de reserva: " + erroReserva.message);
-                    btnSubmit.innerHTML = 'Enviar Intenção de Reserva';
-                    btnSubmit.disabled = false;
-                    return;
-                }
+campoCPFPublico.addEventListener("blur", async function() {
+    const cpf = this.value.trim();
+    if (cpf.length < 14) return;
+    
+    const { data, error } = await supabaseClient
+        .from('hospedes')
+        .select('*')
+        .eq('cpf', cpf)
+        .maybeSingle();
 
-                // Fluxo limpo de sucesso: Como não precisamos ler nada de volta do banco, redirecionamos direto!
-                console.log("Transmissão concluída com sucesso.");
-                window.location.href = "/sucesso";
+    if (error || !data) return;
 
-            } catch (err) {
-                console.error("Falha inesperada na requisição de rede:", err);
-                alert("Erro de conexão ao tentar se comunicar com o servidor do hotel.");
-                btnSubmit.innerHTML = 'Enviar Intenção de Reserva';
-                btnSubmit.disabled = false;
+    preencherCampo("nome_completo", data.nome_completo);
+    preencherCampo("tipoPessoa", data.tipo_pessoa);
+    preencherCampo("posto_graduacao", data.posto_graduacao);
+    preencherCampo("situacao_militar", data.situacao_militar);
+    preencherCampo("forca_militar", data.forca_militar);
+    preencherCampo("om_vinculacao", data.om_vinculacao);
+    preencherCampo("cargo_funcao", data.cargo_funcao);
+    preencherCampo("lotacao_orgao", data.lotacao_orgao);
+    preencherCampo("cidade_origem", data.cidade_origem);
+    preencherCampo("uf", data.uf);
+    preencherCampo("email", data.email);
+    preencherCampo("identidade_publico", data.identidade);
+    preencherCampo("orgao_expedidor_publico", data.orgao_expedidor);
+    
+    if (data.telefone) {
+        let tel = data.telefone.replace(/\D/g, "");
+        if (tel.length === 11) tel = tel.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+        else if (tel.length === 10) tel = tel.replace(/^(\d{2})(\d{4})(\d{4})$/, "($1) $2-$3");
+        preencherCampo("telefone_publico", tel);
+    }
+    
+    atualizarTipoPessoa();
+});
+
+// --- GERENCIAMENTO DE FILA DE DOCUMENTOS ANEXADOS ---
+let arquivosFila = []; 
+const inputNativo = document.getElementById("documentos_digitalizados");
+const listagemVisual = document.getElementById("listaVisualArquivos");
+const dropZone = document.getElementById("dropZonePublica");
+
+inputNativo.addEventListener("change", function(e) {
+    if (e.target.files.length > 0) {
+        for (let i = 0; i < e.target.files.length; i++) {
+            arquivosFila.push(e.target.files[i]);
+        }
+        atualizarVisualizacaoFila();
+    }
+});
+
+["dragenter", "dragover"].forEach(nomeEvento => {
+    dropZone.addEventListener(nomeEvento, (e) => { e.preventDefault(); dropZone.classList.add("dragover"); }, false);
+});
+["dragleave", "drop"].forEach(nomeEvento => {
+    dropZone.addEventListener(nomeEvento, (e) => { e.preventDefault(); dropZone.classList.remove("dragover"); }, false);
+});
+dropZone.addEventListener("drop", (e) => {
+    const dt = e.dataTransfer;
+    if (dt.files.length > 0) {
+        for (let i = 0; i < dt.files.length; i++) {
+            arquivosFila.push(dt.files[i]);
+        }
+        atualizarVisualizacaoFila();
+    }
+});
+
+function atualizarVisualizacaoFila() {
+    listagemVisual.innerHTML = "";
+    arquivosFila.forEach((arquivo, idx) => {
+        const divItem = document.createElement("div");
+        divItem.className = "item-arquivo-fila";
+        divItem.innerHTML = `
+            <span class="nome-arquivo-texto">📄 ${arquivo.name}</span>
+            <button type="button" class="btn-remover-arquivo" onclick="removerArquivoFila(${idx})">✕</button>
+        `;
+        listagemVisual.appendChild(divItem);
+    });
+}
+
+window.removerArquivoFila = function(indexAlvo) {
+    arquivosFila.splice(indexAlvo, 1);
+    atualizarVisualizacaoFila();
+};
+
+document.getElementById("formReservaPublica").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const btn = document.getElementById("btnEnviar");
+    btn.disabled = true;
+    btn.innerText = "Enviando Solicitação...";
+
+    const inputNome = document.getElementById("nome_completo").value;
+    const inputCPF = document.getElementById("cpf_publico").value;
+    const inputEntradaData = document.getElementById("data_entrada").value;
+    const inputSaidaData = document.getElementById("data_saida").value;
+
+    const servicoQuartoSelecionado = document.querySelector('input[name="servico_quarto"]:checked')?.value || "Pela manhã";
+    const hospedagemPetSelecionado = document.querySelector('input[name="hospedagem_pet"]:checked')?.value || "Não";
+    const leuNgaSelecionado = document.querySelector('input[name="leu_nga"]:checked')?.value || "Não";
+
+    const dadosHospede = {
+        cpf: inputCPF,
+        nome_completo: inputNome,
+        tipo_pessoa: document.getElementById("tipoPessoa").value,
+        cidade_origem: document.getElementById("cidade_origem").value,
+        uf: document.getElementById("uf").value,
+        email: document.getElementById("email").value,
+        telefone: document.getElementById("telefone_publico").value,
+        posto_graduacao: document.getElementById("posto_graduacao").value,
+        situacao_militar: document.getElementById("situacao_militar").value,
+        forca_militar: document.getElementById("forca_militar").value,
+        om_vinculacao: document.getElementById("om_vinculacao").value,
+        cargo_funcao: document.getElementById("cargo_funcao").value,
+        lotacao_orgao: document.getElementById("lotacao_orgao").value,
+        identidade: document.getElementById("identidade_publico").value,
+        orgao_expedidor: document.getElementById("orgao_expedidor_publico").value
+    };
+
+    // 1. SALVAMENTO NA TABELA DE HÓSPEDES
+    const { data: hospedeExistente, error: erroBusca } = await supabaseClient
+        .from('hospedes')
+        .select('id')
+        .eq('cpf', dadosHospede.cpf)
+        .maybeSingle();
+
+    let erroHospede = null;
+
+    if (hospedeExistente) {
+        const { error: errUp } = await supabaseClient
+            .from('hospedes')
+            .update(dadosHospede)
+            .eq('cpf', dadosHospede.cpf);
+        erroHospede = errUp;
+    } else {
+        const { error: errIn } = await supabaseClient
+            .from('hospedes')
+            .insert([dadosHospede]);
+        erroHospede = errIn;
+    }
+
+    if (erroHospede) {
+        alert("Erro no cadastro de Hóspedes: " + erroHospede.message);
+        btn.disabled = false;
+        btn.innerText = "Submeter Intenção de Reserva";
+        return;
+    }
+
+    // INTERCEPÇÃO DO STORAGE: UPLOAD DOS ARQUIVOS
+    const nomesArquivos = [];
+
+    if (arquivosFila.length > 0) {
+        btn.innerText = "Fazendo upload dos documentos...";
+        for (const arquivo of arquivosFila) {
+            const nomeUnico = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${arquivo.name}`;
+            const { data: dataUpload, error: erroUpload } = await supabaseClient.storage
+                .from('documentos-hospedes')
+                .upload(nomeUnico, arquivo);
+
+            if (!erroUpload) {
+                nomesArquivos.push(nomeUnico);
+            } else {
+                console.error("Erro interno ao transferir arquivo: ", erroUpload.message);
+            }
+        }
+    }
+
+    // 2. CADASTRO DE RESERVAS
+    const dadosReserva = {
+        cpf: inputCPF,
+        nome_completo: inputNome,
+        tipo_pessoa: document.getElementById("tipoPessoa").value,
+        cidade_origem: document.getElementById("cidade_origem").value,
+        uf: document.getElementById("uf").value,
+        email: document.getElementById("email").value,
+        telefone: document.getElementById("telefone_publico").value,
+        posto_graduacao: document.getElementById("posto_graduacao").value,
+        situacao_militar: document.getElementById("situacao_militar").value,
+        forca_militar: document.getElementById("forca_militar").value,
+        om_vinculacao: document.getElementById("om_vinculacao").value,
+        cargo_funcao: document.getElementById("cargo_funcao").value,
+        lotacao_orgao: document.getElementById("lotacao_orgao").value,
+        identidade: document.getElementById("identidade_publico").value,
+        orgao_expedidor: document.getElementById("orgao_expedidor_publico").value,
+        data_entrada: inputEntradaData,
+        data_saida: inputSaidaData,
+        servico_quarto: servicoQuartoSelecionado,
+        alergia_cafe: document.getElementById("alergia_cafe").value,
+        hospedagem_pet: hospedagemPetSelecionado,
+        observacao_pet: document.getElementById("observacao_pet").value,
+        leu_nga: leuNgaSelecionado,
+        documentos_digitalizados: nomesArquivos.join(","),
+        status: 'Pendente'
+    };
+
+    /* 
+       --- ALTERAÇÃO E ALINHAMENTO TÁTICO COM O RLS DO SUPABASE ---
+       Abaixo, removemos o modificador .select() do encadeamento. 
+       Isso faz com que o formulário público apenas jogue (INSERT) os dados na nuvem em mão única,
+       sem tentar ler a tabela de volta, resolvendo de vez o erro e o carregamento infinito.
+    */
+    const { error: erroReserva } = await supabaseClient
+        .from('reservas')
+        .insert([dadosReserva]);
+
+    if (erroReserva) {
+        alert("Erro ao submeter intenção de reserva: " + erroReserva.message);
+        btn.disabled = false;
+        btn.innerText = "Submeter Intenção de Reserva";
+        return;
+    }
+
+    // 3. SALVAMENTO DE DEPENDENTES ALINHADA COM O PROJETO INTERNO
+    const caixasDependentes = document.querySelectorAll(".dependente-box");
+    let contagemAcompanhantes = 0;
+    if (caixasDependentes.length > 0) {
+        const listaParaInserir = [];
+        
+        caixasDependentes.forEach(box => {
+            const nome = box.querySelector(".dep-nome").value;
+            const parentesco = box.querySelector(".dep-parentesco").value;
+            const idade = box.querySelector(".dep-idade").value;
+
+            if (nome.trim() !== "") {
+                contagemAcompanhantes++;
+                listaParaInserir.push({
+                    cpf_titular: inputCPF, // Vinculação direta pelo CPF único do titular
+                    nome: nome,              
+                    parentesco: parentesco,  
+                    idade: idade ? parseInt(idade) : null 
+                });
             }
         });
-    </script>
+
+        if (listaParaInserir.length > 0) {
+            const { error: erroDeps } = await supabaseClient
+                .from('dependentes')
+                .insert(listaParaInserir);
+
+            if (erroDeps) {
+                console.error("Erro estrutural ao gravar acompanhantes no Supabase: ", erroDeps.message);
+            }
+        }
+    }
+
+    // --- ENGENHARIA DE MONTAGEM DA STRING DO WHATSAPP ---
+    const NUMERO_WHATSAPP_HOTEL = "5555991695930"; 
+    const fData = (dStr) => dStr.split("-").reverse().join("/");
+
+    const textoMensagem = `*SOLICITAÇÃO DE HOSPEDAGEM - HTI*\n\n` +
+                          `• *Hóspede:* ${inputNome}\n` +
+                          `• *CPF:* ${inputCPF}\n` +
+                          `• *Período:* ${fData(inputEntradaData)} até ${fData(inputSaidaData)}\n` +
+                          `• *Acompanhantes:* ${contagemAcompanhantes}\n` +
+                          `• *Anexos:* ${nomesArquivos.length} arquivo(s) enviado(s)\n\n` +
+                          `_Minha intenção de reserva e documentações já foram transmitidas para o sistema central do hotel._`;
+
+    const urlWhatsAppFinal = `https://api.whatsapp.com/send?phone=${NUMERO_WHATSAPP_HOTEL}&text=${encodeURIComponent(textoMensagem)}`;
+    document.getElementById("btnWhatsApp").setAttribute("href", urlWhatsAppFinal);
+
+    // Esconde o formulário principal e exibe de forma centralizada e limpa a tela de sucesso
+    document.getElementById("conteudoFormulario").style.display = "none";
+    document.getElementById("telaSucesso").style.display = "flex";
+    window.scrollTo(0, 0);
+});
+</script>
 </body>
 </html>
