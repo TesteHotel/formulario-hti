@@ -795,6 +795,10 @@ campoCPFPublico.addEventListener("blur", async function() {
     const cpf = this.value.trim();
     if (cpf.length < 14) return;
     
+    /* 
+       --- RESTAURADO O COMANDO ORIGINAL DE AUTOCOMPOSIÇÃO ---
+       Este bloco volta a fazer a busca exata dos dados históricos de hóspedes pelo CPF na nuvem.
+    */
     const { data, error } = await supabaseClient
         .from('hospedes')
         .select('*')
@@ -987,15 +991,13 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
     };
 
     /* 
-       --- ALTERAÇÃO E ALINHAMENTO TÁTICO COM O RLS DO SUPABASE ---
-       Abaixo, removemos o modificador .select() do encadeamento. 
-       Isso faz com que o formulário público apenas jogue (INSERT) os dados na nuvem em mão única,
-       sem tentar ler a tabela de volta, resolvendo de vez o erro e o carregamento infinito.
+       --- MANUTENÇÃO DA INSERÇÃO EM MÃO ÚNICA ---
+       Mantemos apenas o comando .insert() sem o método .select() para herdar a blindagem do RLS
+       e evitar o travamento por carregamento infinito.
     */
     const { error: erroReserva } = await supabaseClient
         .from('reservas')
         .insert([dadosReserva]);
-        .select();
 
     if (erroReserva) {
         alert("Erro ao submeter intenção de reserva: " + erroReserva.message);
@@ -1018,7 +1020,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
             if (nome.trim() !== "") {
                 contagemAcompanhantes++;
                 listaParaInserir.push({
-                    cpf_titular: inputCPF, // Vinculação direta pelo CPF único do titular
+                    cpf_titular: inputCPF, // Vinculação direta via CPF do titular histórico
                     nome: nome,              
                     parentesco: parentesco,  
                     idade: idade ? parseInt(idade) : null 
@@ -1052,7 +1054,6 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
     const urlWhatsAppFinal = `https://api.whatsapp.com/send?phone=${NUMERO_WHATSAPP_HOTEL}&text=${encodeURIComponent(textoMensagem)}`;
     document.getElementById("btnWhatsApp").setAttribute("href", urlWhatsAppFinal);
 
-    // Esconde o formulário principal e exibe de forma centralizada e limpa a tela de sucesso
     document.getElementById("conteudoFormulario").style.display = "none";
     document.getElementById("telaSucesso").style.display = "flex";
     window.scrollTo(0, 0);
