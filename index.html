@@ -995,6 +995,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
     const { error: erroReserva } = await supabaseClient
         .from('reservas')
         .insert([dadosReserva]);
+        .select();
 
     if (erroReserva) {
         alert("Erro ao submeter intenção de reserva: " + erroReserva.message);
