@@ -989,7 +989,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
     const { data: reservaCriada, error: erroReserva } = await supabaseClient
         .from('reservas')
         .insert([dadosReserva])
-        .select();
+        
 
     if (erroReserva) {
         alert("Erro ao submeter intenção de reserva: " + erroReserva.message);
@@ -1038,7 +1038,6 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
     const fData = (dStr) => dStr.split("-").reverse().join("/");
 
     const textoMensagem = `*SOLICITAÇÃO DE HOSPEDAGEM - HTI*\n\n` +
-                          `• *ID da Reserva:* #${idNovaReserva}\n` +
                           `• *Hóspede:* ${inputNome}\n` +
                           `• *CPF:* ${inputCPF}\n` +
                           `• *Período:* ${fData(inputEntradaData)} até ${fData(inputSaidaData)}\n` +
