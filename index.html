@@ -912,27 +912,11 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         orgao_expedidor: document.getElementById("orgao_expedidor_publico").value
     };
 
-    // 1. SALVAMENTO NA TABELA DE HÓSPEDES
-    const { data: hospedeExistente, error: erroBusca } = await supabaseClient
-        .from('hospedes')
-        .select('id')
-        .eq('cpf', dadosHospede.cpf)
-        .maybeSingle();
-
-    let erroHospede = null;
-
-    if (hospedeExistente) {
-        const { error: errUp } = await supabaseClient
-            .from('hospedes')
-            .update(dadosHospede)
-            .eq('cpf', dadosHospede.cpf);
-        erroHospede = errUp;
-    } else {
-        const { error: errIn } = await supabaseClient
-            .from('hospedes')
-            .insert([dadosHospede]);
-        erroHospede = errIn;
-    }
+    // 1. SALVAMENTO INTELIGENTE NA TABELA DE HÓSPEDES (UPSERT)
+    // O parâmetro onConflict avisa ao banco para atualizar caso o CPF já exista
+    const { error: erroHospede } = await supabaseClient
+    .from('hospedes')
+    .upsert(dadosHospede, { onConflict: 'cpf' });
 
     if (erroHospede) {
         alert("Erro no cadastro de Hóspedes: " + erroHospede.message);
