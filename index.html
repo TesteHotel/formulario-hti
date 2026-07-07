@@ -29,7 +29,7 @@
             margin-bottom: 48px;   
         }
 
-        /* --- LOGOTIPO AJUSTADO: SEM CORTES --- */
+        /* --- LOGOTIPO AJUSTADO --- */
         .logo-ht { 
             width: 180px;             
             height: auto;             
@@ -335,7 +335,7 @@
             background: #fee2e2;
         }
 
-        /* --- DESIGN OPERACIONAL CORRIGIDO: CENTRALIZAÇÃO ABSOLUTA DA TELA DE SUCESSO --- */
+        /* --- TELA DE SUCESSO CENTRALIZADA --- */
         .container-sucesso {
             display: none; 
             align-items: center;
@@ -439,7 +439,7 @@
             background-color: #e2e8f0;
         }
 
-        /* --- DESIGN RESPONSIVO PARA DISPOSITIVOS MÓVEIS (CELULAR) --- */
+        /* --- DESIGN RESPONSIVO CELULAR --- */
         @media (max-width: 600px) {
             .container-publico {
                 margin: 16px auto;
@@ -485,7 +485,7 @@
             }
 
             .area-upload-container span:last-child {
-                display: none; /* Esconde o texto "ou arraste e solte" no celular */
+                display: none;
             }
 
             .botoes-finais {
@@ -799,7 +799,6 @@ campoCPFPublico.addEventListener("blur", async function() {
     const { data, error } = await supabaseClient
         .rpc('consultar_cadastro_publico', { cpf_digitado: cpf });
     
-    // Como a função retorna uma lista, pegamos o primeiro resultado encontrado
     const hospedeExistente = data && data.length > 0 ? data[0] : null;
     
     if (error || !hospedeExistente) return;
@@ -913,7 +912,6 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
     };
 
     // 1. SALVAMENTO INTELIGENTE NA TABELA DE HÓSPEDES (UPSERT)
-    // O parâmetro onConflict avisa ao banco para atualizar caso o CPF já exista
     const { error: erroHospede } = await supabaseClient
         .from('hospedes')
         .upsert(dadosHospede, { onConflict: 'cpf' });
@@ -925,7 +923,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         return;
     }
 
-    // INTERCEPÇÃO DO STORAGE: UPLOAD DOS ARQUIVOS
+    // UPLOAD DOS ARQUIVOS PARA O STORAGE
     const nomesArquivos = [];
 
     if (arquivosFila.length > 0) {
@@ -944,7 +942,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         }
     }
 
-    // 2. CADASTRO DE RESERVAS
+    // 2. CADASTRO DE RESERVAS (Inserção pura de mão única, gera uma nova linha sempre)
     const dadosReserva = {
         cpf: inputCPF,
         nome_completo: inputNome,
@@ -972,7 +970,6 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         status: 'Pendente'
     };
 
-    // Inserção em "mão única" sem tentar ler o retorno (Garante compatibilidade com RLS ativo)
     const { error: erroReserva } = await supabaseClient
         .from('reservas')
         .insert([dadosReserva]);
@@ -984,7 +981,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         return;
     }
 
-    // 3. SALVAMENTO DE DEPENDENTES ALINHADA COM O PROJETO INTERNO
+    // 3. SALVAMENTO DE DEPENDENTES POR VINCULAÇÃO DE CPF DO TITULAR
     const caixasDependentes = document.querySelectorAll(".dependente-box");
     let contagemAcompanhantes = 0;
     if (caixasDependentes.length > 0) {
@@ -998,7 +995,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
             if (nome.trim() !== "") {
                 contagemAcompanhantes++;
                 listaParaInserir.push({
-                    cpf_titular: inputCPF, // Vinculação estável usando o CPF único do titular
+                    cpf_titular: inputCPF, 
                     nome: nome,              
                     parentesco: parentesco,  
                     idade: idade ? parseInt(idade) : null 
@@ -1017,7 +1014,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         }
     }
 
-    // --- ENGENHARIA DE MONTAGEM DA STRING DO WHATSAPP ---
+    // --- MONTAGEM DA STRING DO WHATSAPP ---
     const NUMERO_WHATSAPP_HOTEL = "5555991695930"; 
     const fData = (dStr) => dStr.split("-").reverse().join("/");
 
