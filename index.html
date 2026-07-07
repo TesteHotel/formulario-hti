@@ -819,8 +819,8 @@ campoCPFPublico.addEventListener("blur", async function() {
     preencherCampo("identidade_publico", hospedeExistente.identidade);
     preencherCampo("orgao_expedidor_publico", hospedeExistente.orgao_expedidor);
     
-    if (data.telefone) {
-        let tel = data.telefone.replace(/\D/g, "");
+    if (hospedeExistente.telefone) {
+        let tel = hospedeExistente.telefone.replace(/\D/g, "");
         if (tel.length === 11) tel = tel.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
         else if (tel.length === 10) tel = tel.replace(/^(\d{2})(\d{4})(\d{4})$/, "($1) $2-$3");
         preencherCampo("telefone_publico", tel);
@@ -915,8 +915,8 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
     // 1. SALVAMENTO INTELIGENTE NA TABELA DE HÓSPEDES (UPSERT)
     // O parâmetro onConflict avisa ao banco para atualizar caso o CPF já exista
     const { error: erroHospede } = await supabaseClient
-    .from('hospedes')
-    .upsert(dadosHospede, { onConflict: 'cpf' });
+        .from('hospedes')
+        .upsert(dadosHospede, { onConflict: 'cpf' });
 
     if (erroHospede) {
         alert("Erro no cadastro de Hóspedes: " + erroHospede.message);
@@ -972,10 +972,10 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         status: 'Pendente'
     };
 
-    const { data: reservaCriada, error: erroReserva } = await supabaseClient
+    // Inserção em "mão única" sem tentar ler o retorno (Garante compatibilidade com RLS ativo)
+    const { error: erroReserva } = await supabaseClient
         .from('reservas')
-        .insert([dadosReserva])
-        
+        .insert([dadosReserva]);
 
     if (erroReserva) {
         alert("Erro ao submeter intenção de reserva: " + erroReserva.message);
@@ -983,8 +983,6 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         btn.innerText = "Submeter Intenção de Reserva";
         return;
     }
-
-    const idNovaReserva = reservaCriada[0].id;
 
     // 3. SALVAMENTO DE DEPENDENTES ALINHADA COM O PROJETO INTERNO
     const caixasDependentes = document.querySelectorAll(".dependente-box");
@@ -1000,7 +998,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
             if (nome.trim() !== "") {
                 contagemAcompanhantes++;
                 listaParaInserir.push({
-                    id_reserva: idNovaReserva,
+                    cpf_titular: inputCPF, // Vinculação estável usando o CPF único do titular
                     nome: nome,              
                     parentesco: parentesco,  
                     idade: idade ? parseInt(idade) : null 
