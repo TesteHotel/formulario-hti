@@ -29,7 +29,6 @@
             margin-bottom: 48px;   
         }
 
-        /* --- LOGOTIPO AJUSTADO --- */
         .logo-ht { 
             width: 180px;             
             height: auto;             
@@ -248,7 +247,6 @@
             background-color: #14281c;
         }
 
-        /* --- CONTAINER DE UPLOAD --- */
         .area-upload-container {
             border: 2px dashed #cbd5e1;
             border-radius: var(--radius-md);
@@ -335,7 +333,6 @@
             background: #fee2e2;
         }
 
-        /* --- TELA DE SUCESSO CENTRALIZADA --- */
         .container-sucesso {
             display: none; 
             align-items: center;
@@ -439,7 +436,6 @@
             background-color: #e2e8f0;
         }
 
-        /* --- DESIGN RESPONSIVO CELULAR --- */
         @media (max-width: 600px) {
             .container-publico {
                 margin: 16px auto;
@@ -795,7 +791,6 @@ campoCPFPublico.addEventListener("blur", async function() {
     const cpf = this.value.trim();
     if (cpf.length < 14) return;
     
-    // Chamada inteligente que invoca a função que você criou no SQL Editor
     const { data, error } = await supabaseClient
         .rpc('consultar_cadastro_publico', { cpf_digitado: cpf });
     
@@ -803,7 +798,6 @@ campoCPFPublico.addEventListener("blur", async function() {
     
     if (error || !hospedeExistente) return;
     
-    // Preenche os campos usando o resultado da função segura
     preencherCampo("nome_completo", hospedeExistente.nome_completo);
     preencherCampo("tipoPessoa", hospedeExistente.tipo_pessoa);
     preencherCampo("posto_graduacao", hospedeExistente.posto_graduacao);
@@ -828,7 +822,6 @@ campoCPFPublico.addEventListener("blur", async function() {
     atualizarTipoPessoa();
 });
 
-// --- GERENCIAMENTO DE FILA DE DOCUMENTOS ANEXADOS ---
 let arquivosFila = []; 
 const inputNativo = document.getElementById("documentos_digitalizados");
 const listagemVisual = document.getElementById("listaVisualArquivos");
@@ -911,19 +904,23 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         orgao_expedidor: document.getElementById("orgao_expedidor_publico").value
     };
 
-    // 1. SALVAMENTO INTELIGENTE NA TABELA DE HÓSPEDES (UPSERT)
+    // ALTERAÇÃO CRUCIAL AQUI: Usamos .insert simples para evitar o erro de RLS do UPDATE anônimo
     const { error: erroHospede } = await supabaseClient
         .from('hospedes')
-        .upsert(dadosHospede, { onConflict: 'cpf' });
+        .insert([dadosHospede]);
 
     if (erroHospede) {
-        alert("Erro no cadastro de Hóspedes: " + erroHospede.message);
-        btn.disabled = false;
-        btn.innerText = "Submeter Intenção de Reserva";
-        return;
+        // Se o erro for o código '23505' (CPF já existente), ignoramos e prosseguimos com a reserva
+        if (erroHospede.code === '23505') {
+            console.log("Hóspede antigo retornando. Continuando com o fluxo da reserva...");
+        } else {
+            alert("Erro no cadastro de Hóspedes: " + erroHospede.message);
+            btn.disabled = false;
+            btn.innerText = "Submeter Intenção de Reserva";
+            return;
+        }
     }
 
-    // UPLOAD DOS ARQUIVOS PARA O STORAGE
     const nomesArquivos = [];
 
     if (arquivosFila.length > 0) {
@@ -942,7 +939,6 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         }
     }
 
-    // 2. CADASTRO DE RESERVAS (Inserção pura de mão única, gera uma nova linha sempre)
     const dadosReserva = {
         cpf: inputCPF,
         nome_completo: inputNome,
@@ -981,7 +977,6 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         return;
     }
 
-    // 3. SALVAMENTO DE DEPENDENTES POR VINCULAÇÃO DE CPF DO TITULAR
     const caixasDependentes = document.querySelectorAll(".dependente-box");
     let contagemAcompanhantes = 0;
     if (caixasDependentes.length > 0) {
@@ -1014,7 +1009,6 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         }
     }
 
-    // --- MONTAGEM DA STRING DO WHATSAPP ---
     const NUMERO_WHATSAPP_HOTEL = "5555991695930"; 
     const fData = (dStr) => dStr.split("-").reverse().join("/");
 
