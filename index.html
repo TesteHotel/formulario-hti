@@ -924,13 +924,13 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
     if (arquivosFila.length > 0) {
         btn.innerText = "Fazendo upload dos documentos...";
         for (const arquivo of arquivosFila) {
-            const nomeUnico = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${arquivo.name}`;
+            const nameUnico = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${arquivo.name}`;
             const { data: dataUpload, error: erroUpload } = await supabaseClient.storage
                 .from('documentos-hospedes')
-                .upload(nomeUnico, arquivo);
+                .upload(nameUnico, arquivo);
 
             if (!erroUpload) {
-                nomesArquivos.push(nomeUnico);
+                nomesArquivos.push(nameUnico);
             } else {
                 console.error("Erro interno ao transferir arquivo: ", erroUpload.message);
             }
@@ -964,10 +964,10 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         status: 'Pendente'
     };
 
-    const { data: reservaCriada, error: erroReserva } = await supabaseClient
+    // Alterado de .insert().select() para .insert() puro para não invocar políticas de SELECT no banco
+    const { error: erroReserva } = await supabaseClient
         .from('reservas')
-        .insert([dadosReserva])
-        .select();
+        .insert([dadosReserva]);
 
     if (erroReserva) {
         alert("Erro ao submeter intenção de reserva: " + erroReserva.message);
@@ -976,12 +976,10 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         return;
     }
 
-    const idReservaGerado = reservaCriada && reservaCriada.length > 0 ? reservaCriada[0].id : null;
-
     const caixasDependentes = document.querySelectorAll(".dependente-box");
     let contagemAcompanhantes = 0;
     
-    if (caixasDependentes.length > 0 && idReservaGerado) {
+    if (caixasDependentes.length > 0) {
         const listaParaInserir = [];
         
         caixasDependentes.forEach(box => {
@@ -992,7 +990,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
             if (nome.trim() !== "") {
                 contagemAcompanhantes++;
                 listaParaInserir.push({
-                    id_reserva: idReservaGerado,  
+                    cpf_titular: inputCPF,   // Enviamos o CPF do titular para mapeamento interno no Trigger do Supabase
                     nome: nome,              
                     parentesco: parentesco,  
                     idade: idade ? parseInt(idade) : null
