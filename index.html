@@ -299,6 +299,7 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius-sm);
             font-size: 13.5px;
+            animation: fadeIn 0.2s ease;
             box-sizing: border-box;
             width: 100%;
         }
@@ -433,6 +434,78 @@
 
         .btn-sucesso-secondary:hover {
             background-color: #e2e8f0;
+        }
+
+        @media (max-width: 600px) {
+            .container-publico {
+                margin: 16px auto;
+                padding: 0 12px;
+            }
+
+            .topo-publico {
+                margin-bottom: 24px;
+            }
+
+            .topo-publico h1 {
+                font-size: 22px;
+            }
+
+            .logo-ht {
+                width: 140px;
+                max-height: 140px;
+                margin-bottom: 16px;
+            }
+
+            .card-secao {
+                padding: 24px 16px;
+                margin-bottom: 16px;
+                border-radius: 12px;
+            }
+
+            .grid-form {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .opcoes {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .opcao-card {
+                padding: 12px;
+            }
+
+            .area-upload-container {
+                padding: 16px;
+            }
+
+            .area-upload-container span:last-child {
+                display: none;
+            }
+
+            .botoes-finais {
+                justify-content: center;
+            }
+
+            .btn-enviar {
+                width: 100%;
+                padding: 14px 20px;
+            }
+
+            .card-sucesso {
+                padding: 32px 16px;
+                gap: 20px;
+            }
+
+            .titulo-sucesso {
+                font-size: 20px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(2px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -831,11 +904,13 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         orgao_expedidor: document.getElementById("orgao_expedidor_publico").value
     };
 
+    // ALTERAÇÃO CRUCIAL AQUI: Usamos .insert simples para evitar o erro de RLS do UPDATE anônimo
     const { error: erroHospede } = await supabaseClient
         .from('hospedes')
         .insert([dadosHospede]);
 
     if (erroHospede) {
+        // Se o erro for o código '23505' (CPF já existente), ignoramos e prosseguimos com a reserva
         if (erroHospede.code === '23505') {
             console.log("Hóspede antigo retornando. Continuando com o fluxo da reserva...");
         } else {
@@ -891,11 +966,9 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         status: 'Pendente'
     };
 
-    // CORREÇÃO CRUCIAL: Adicionado o modificador .select() para retornar o ID inserido[cite: 3]
-    const { data: reservaCriada, error: erroReserva } = await supabaseClient
+    const { error: erroReserva } = await supabaseClient
         .from('reservas')
-        .insert([dadosReserva])
-        .select(); // <-- Recupera a linha salva com o ID[cite: 3]
+        .insert([dadosReserva]);
 
     if (erroReserva) {
         alert("Erro ao submeter intenção de reserva: " + erroReserva.message);
@@ -904,13 +977,9 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         return;
     }
 
-    // Extrai o ID autoincrementado gerado pelo Supabase[cite: 3]
-    const idReservaGerado = reservaCriada && reservaCriada.length > 0 ? reservaCriada[0].id : null;
-
     const caixasDependentes = document.querySelectorAll(".dependente-box");
     let contagemAcompanhantes = 0;
-    
-    if (caixasDependentes.length > 0 && idReservaGerado) {
+    if (caixasDependentes.length > 0) {
         const listaParaInserir = [];
         
         caixasDependentes.forEach(box => {
@@ -921,7 +990,6 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
             if (nome.trim() !== "") {
                 contagemAcompanhantes++;
                 listaParaInserir.push({
-                    id_reserva: idReservaGerado,  // CORREÇÃO: Amarra os dependentes ao ID da reserva[cite: 3]
                     cpf_titular: inputCPF, 
                     nome: nome,              
                     parentesco: parentesco,  
