@@ -964,11 +964,10 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         status: 'Pendente'
     };
 
-    // CORREÇÃO CRUCIAL AQUI: Adicionamos o modificador .select() para recuperar o id numérico gerado[cite: 4]
     const { data: reservaCriada, error: erroReserva } = await supabaseClient
         .from('reservas')
         .insert([dadosReserva])
-        .select(); // <-- Solicita o ID gerado de volta para o JavaScript[cite: 4]
+        .select();
 
     if (erroReserva) {
         alert("Erro ao submeter intenção de reserva: " + erroReserva.message);
@@ -977,13 +976,11 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         return;
     }
 
-    // Extrai o ID real que o Supabase acabou de criar para esta reserva[cite: 4]
     const idReservaGerado = reservaCriada && reservaCriada.length > 0 ? reservaCriada[0].id : null;
 
     const caixasDependentes = document.querySelectorAll(".dependente-box");
     let contagemAcompanhantes = 0;
     
-    // Alimenta os dependentes no banco apenas se o ID da reserva principal foi capturado[cite: 4]
     if (caixasDependentes.length > 0 && idReservaGerado) {
         const listaParaInserir = [];
         
@@ -995,10 +992,10 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
             if (nome.trim() !== "") {
                 contagemAcompanhantes++;
                 listaParaInserir.push({
-                    id_reserva: idReservaGerado,  // <-- Satisfaz o ConstraintTrigger (FK) do banco![cite: 4]
+                    id_reserva: idReservaGerado,  
                     nome: nome,              
                     parentesco: parentesco,  
-                    id_dep: idades_lista if 'idades_lista' in locals() else (idade ? parseInt(idade) : null) // Tratamento da idade[cite: 4]
+                    idade: idade ? parseInt(idade) : null
                 });
             }
         });
