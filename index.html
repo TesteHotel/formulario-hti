@@ -904,13 +904,11 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         orgao_expedidor: document.getElementById("orgao_expedidor_publico").value
     };
 
-    // ALTERAÇÃO CRUCIAL AQUI: Usamos .insert simples para evitar o erro de RLS do UPDATE anônimo
     const { error: erroHospede } = await supabaseClient
         .from('hospedes')
         .insert([dadosHospede]);
 
     if (erroHospede) {
-        // Se o erro for o código '23505' (CPF já existente), ignoramos e prosseguimos com a reserva
         if (erroHospede.code === '23505') {
             console.log("Hóspede antigo retornando. Continuando com o fluxo da reserva...");
         } else {
@@ -1018,7 +1016,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
                           `• *Período:* ${fData(inputEntradaData)} até ${fData(inputSaidaData)}\n` +
                           `• *Acompanhantes:* ${contagemAcompanhantes}\n` +
                           `• *Anexos:* ${nomesArquivos.length} arquivo(s) enviado(s)\n\n` +
-                          `_Minha intenção de reserva e documentações já foram transmitidas para o sistema central do hotel._`;
+                          `_Minha intenção de reserva e documentações já foram transmitidas para o systema central do hotel._`;
 
     const urlWhatsAppFinal = `https://api.whatsapp.com/send?phone=${NUMERO_WHATSAPP_HOTEL}&text=${encodeURIComponent(textoMensagem)}`;
     document.getElementById("btnWhatsApp").setAttribute("href", urlWhatsAppFinal);
