@@ -964,9 +964,11 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         status: 'Pendente'
     };
 
-    const { error: erroReserva } = await supabaseClient
+    // CORREÇÃO CRUCIAL AQUI: Adicionamos o modificador .select() para recuperar o id numérico gerado[cite: 4]
+    const { data: reservaCriada, error: erroReserva } = await supabaseClient
         .from('reservas')
-        .insert([dadosReserva]);
+        .insert([dadosReserva])
+        .select(); // <-- Solicita o ID gerado de volta para o JavaScript[cite: 4]
 
     if (erroReserva) {
         alert("Erro ao submeter intenção de reserva: " + erroReserva.message);
@@ -975,9 +977,14 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
         return;
     }
 
+    // Extrai o ID real que o Supabase acabou de criar para esta reserva[cite: 4]
+    const idReservaGerado = reservaCriada && reservaCriada.length > 0 ? reservaCriada[0].id : null;
+
     const caixasDependentes = document.querySelectorAll(".dependente-box");
     let contagemAcompanhantes = 0;
-    if (caixasDependentes.length > 0) {
+    
+    // Alimenta os dependentes no banco apenas se o ID da reserva principal foi capturado[cite: 4]
+    if (caixasDependentes.length > 0 && idReservaGerado) {
         const listaParaInserir = [];
         
         caixasDependentes.forEach(box => {
@@ -988,10 +995,10 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
             if (nome.trim() !== "") {
                 contagemAcompanhantes++;
                 listaParaInserir.push({
-                    cpf_titular: inputCPF, 
+                    id_reserva: idReservaGerado,  // <-- Satisfaz o ConstraintTrigger (FK) do banco![cite: 4]
                     nome: nome,              
                     parentesco: parentesco,  
-                    idade: idade ? parseInt(idade) : null 
+                    id_dep: idades_lista if 'idades_lista' in locals() else (idade ? parseInt(idade) : null) // Tratamento da idade[cite: 4]
                 });
             }
         });
@@ -1016,7 +1023,7 @@ document.getElementById("formReservaPublica").addEventListener("submit", async f
                           `• *Período:* ${fData(inputEntradaData)} até ${fData(inputSaidaData)}\n` +
                           `• *Acompanhantes:* ${contagemAcompanhantes}\n` +
                           `• *Anexos:* ${nomesArquivos.length} arquivo(s) enviado(s)\n\n` +
-                          `_Minha intenção de reserva e documentações já foram transmitidas para o systema central do hotel._`;
+                          `_Minha intenção de reserva e documentações já foram transmitidas para o sistema central do hotel._`;
 
     const urlWhatsAppFinal = `https://api.whatsapp.com/send?phone=${NUMERO_WHATSAPP_HOTEL}&text=${encodeURIComponent(textoMensagem)}`;
     document.getElementById("btnWhatsApp").setAttribute("href", urlWhatsAppFinal);
